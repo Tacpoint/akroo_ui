@@ -33,7 +33,7 @@ const _nav = [
     component: CNavGroup,
     name: 'Lend',
     to: '/buttons',
-    icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
@@ -46,7 +46,7 @@ const _nav = [
     component: CNavItem,
     name: 'Borrow',
     to: '/charts',
-    icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
   },
 ]
 
