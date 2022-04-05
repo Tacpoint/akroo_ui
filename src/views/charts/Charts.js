@@ -11,15 +11,16 @@ import {
 import { DocsCallout } from 'src/components'
 
 const Charts = () => {
-  const random = () => Math.round(Math.random() * 100)
-
+  const random = () => {
+    Math.round(Math.random() * 100)
+  }
   return (
     <CRow>
       <CCol xs={12}>
         <DocsCallout
           name="Chart"
           href="components/chart"
-          content="React wrapper component for Chart.js 3.0, the most popular charting library."
+          content="React wrapper component for Chart.js 3.0, the most popular charting library!"
         />
       </CCol>
       <CCol xs={6}>
