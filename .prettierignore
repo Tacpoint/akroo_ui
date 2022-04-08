@@ -1,4 +1,5 @@
 dist/
-src/contracts/loans.js
+src/contracts/
 src/components/AppHeader.js
-src/views/lend/WBTCDeposit.js
+src/views/lend/
+src/views/borrow/

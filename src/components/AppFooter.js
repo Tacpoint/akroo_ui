@@ -5,7 +5,7 @@ const AppFooter = () => {
   return (
     <CFooter>
       <div>
-        <span className="ms-1">&copy; 2022 Akroo.</span>
+        <span className="ms-1">&copy; {new Date().getFullYear()} Akroo.</span>
       </div>
     </CFooter>
   )

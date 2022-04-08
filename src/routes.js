@@ -2,6 +2,8 @@ import React from 'react'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const WBTCDeposit = React.lazy(() => import('./views/lend/WBTCDeposit'))
+const RBTCDeposit = React.lazy(() => import('./views/lend/RBTCDeposit'))
+const RequestLoan = React.lazy(() => import('./views/borrow/RequestLoan'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
@@ -55,6 +57,8 @@ const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/wbtcdeposit', name: 'WBTC Deposit', element: WBTCDeposit },
+  { path: '/rbtcdeposit', name: 'RBTC Deposit', element: RBTCDeposit },
+  { path: '/requestloan', name: 'Request Loan', element: RequestLoan },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },

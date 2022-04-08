@@ -53,28 +53,28 @@ import avatar3 from 'src/assets/images/avatars/3.jpg'
 import avatar4 from 'src/assets/images/avatars/4.jpg'
 import avatar5 from 'src/assets/images/avatars/5.jpg'
 import avatar6 from 'src/assets/images/avatars/6.jpg'
-import wbtclogo from 'src/assets/images/wrapped-bitcoin.png'
+import rbtclogo from 'src/assets/images/ren-bitcoin.png'
 
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
 
 import { ethers } from 'ethers'
 import { loans } from 'src/contracts/loans'
-import { wbtc } from 'src/contracts/wbtc'
+import { rbtc } from 'src/contracts/rbtc'
 
-const WBTCDeposit = () => {
+const RBTCDeposit = () => {
 
   var util = require('util')
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
-  const [wbtcOnDeposit, setWbtcOnDeposit] = useState()
-  const [wbtcAuthorized, setWbtcAuthorized] = useState()
-  const [wbtcBalance, setWbtcBalance] = useState()
+  const [rbtcOnDeposit, setRbtcOnDeposit] = useState()
+  const [rbtcAuthorized, setRbtcAuthorized] = useState()
+  const [rbtcBalance, setRbtcBalance] = useState()
 
   const handleLenderDeposit = async () => {
 
-    const depositAmt = document.querySelector('#wbtcAmt');
+    const depositAmt = document.querySelector('#rbtcAmt');
     console.log('deposit amt : ', depositAmt.value)
 
     //console.log(util.inspect(depositAmt))
@@ -86,19 +86,19 @@ const WBTCDeposit = () => {
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
 
       let bn = ethers.BigNumber.from(depositAmt.value)
-      const tx = await loanContract.deposit(loans.WBTC_ADDRESS, bn, {from:userAddress})
+      const tx = await loanContract.deposit(loans.RBTC_ADDRESS, bn, {from:userAddress})
       console.log(`Transaction hash: ${tx.hash}`);
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
-      setWbtcOnDeposit(userWbtcVaultFunds.toString())
+      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
+      setRbtcOnDeposit(userRbtcVaultFunds.toString())
 
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
+      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
+      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
+      setRbtcBalance(rbtcBalance.toString())
+      setRbtcAuthorized(rbtcAuthAmt.toString())
 
     }
     catch (err) {
@@ -109,7 +109,7 @@ const WBTCDeposit = () => {
 
   const handleLenderApproveTransfer = async () => {
 
-    const authAmt = document.querySelector('#wbtcAuth');
+    const authAmt = document.querySelector('#rbtcAuth');
     console.log('Auth amt : ', authAmt.value)
 
     //console.log(util.inspect(depositAmt))
@@ -119,17 +119,17 @@ const WBTCDeposit = () => {
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
       let bn = ethers.BigNumber.from(authAmt.value)
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const tx = await wbtcContract.approve(loans.LOAN_ADDRESS, bn, {from:userAddress})
+      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
+      const tx = await rbtcContract.approve(loans.LOAN_ADDRESS, bn, {from:userAddress})
       console.log(`Transaction hash: ${tx.hash}`);
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
 
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
+      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
+      setRbtcBalance(rbtcBalance.toString())
+      setRbtcAuthorized(rbtcAuthAmt.toString())
 
     }
     catch (err) {
@@ -149,18 +149,18 @@ const WBTCDeposit = () => {
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
-      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
-      console.log('WBTCDeposit - WBTC vault funds balance for account : ',userAddress,' - ', userWbtcVaultFunds.toString())
-      setWbtcOnDeposit(userWbtcVaultFunds.toString())
+      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
+      console.log('RBTCDeposit - renBTC vault funds balance for account : ',userAddress,' - ', userRbtcVaultFunds.toString())
+      setRbtcOnDeposit(userRbtcVaultFunds.toString())
 
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
+      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
+      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
+      setRbtcBalance(rbtcBalance.toString())
+      setRbtcAuthorized(rbtcAuthAmt.toString())
 
-      console.log('WBTC balance : ', wbtcBalance.toString())
-      console.log('WBTC auth amt : ', wbtcAuthAmt.toString())
+      console.log('renBTC balance : ', rbtcBalance.toString())
+      console.log('renBTC auth amt : ', rbtcAuthAmt.toString())
 
     })()
 
@@ -172,9 +172,9 @@ const WBTCDeposit = () => {
           <CCard className="mb-4">
             <CCardHeader>
               <div className="avatar avatar-md">
-                <CImage src={wbtclogo} width={36} height={36} />
+                <CImage src={rbtclogo} width={36} height={36} />
               </div>
-              &nbsp;&nbsp;WBTC Deposits
+              &nbsp;&nbsp;renBTC Deposits
             </CCardHeader>
             <CCardBody>
               <CRow>
@@ -215,32 +215,32 @@ const WBTCDeposit = () => {
 
               <CRow>
                 <CCol sm={6}>
-                  <div className="text-medium-emphasis small">Current WBTC on deposit:</div>
+                  <div className="text-medium-emphasis small">Current renBTC on deposit:</div>
                 </CCol>
                 <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcOnDeposit}</div>
-                </CCol>
-              </CRow>
-              <CRow>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">WBTC balance:</div>
-                </CCol>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcBalance}</div>
+                  <div className="text-medium-emphasis small">{rbtcOnDeposit}</div>
                 </CCol>
               </CRow>
               <CRow>
                 <CCol sm={6}>
-                  <div className="text-medium-emphasis small">WBTC approved for transfer:</div>
+                  <div className="text-medium-emphasis small">renBTC balance:</div>
                 </CCol>
                 <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcAuthorized}</div>
+                  <div className="text-medium-emphasis small">{rbtcBalance}</div>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">renBTC approved for transfer:</div>
+                </CCol>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">{rbtcAuthorized}</div>
                 </CCol>
               </CRow>
               <br />
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAuth" placeholder="WBTC to approve" />
+                  <CFormInput type="text" id="rbtcAuth" placeholder="renBTC to approve" />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" variant="outline" onClick={() => handleLenderApproveTransfer()}>
@@ -250,7 +250,7 @@ const WBTCDeposit = () => {
               </CForm>
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAmt" placeholder="WBTC to deposit" />
+                  <CFormInput type="text" id="rbtcAmt" placeholder="renBTC to deposit" />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" color="success" variant="outline" onClick={() => handleLenderDeposit()}>
@@ -268,4 +268,4 @@ const WBTCDeposit = () => {
   )
 }
 
-export default WBTCDeposit
+export default RBTCDeposit

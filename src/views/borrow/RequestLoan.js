@@ -3,6 +3,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import {
   CImage,
   CButton,
+  CFormSelect,
   CButtonGroup,
   CCard,
   CForm,
@@ -12,8 +13,12 @@ import {
   CCol,
   CProgress,
   CRow,
+  CFormText,
+  CFormCheck,
   CFormLabel,
   CFormInput,
+  CInputGroup,
+  CInputGroupText,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -62,7 +67,7 @@ import { ethers } from 'ethers'
 import { loans } from 'src/contracts/loans'
 import { wbtc } from 'src/contracts/wbtc'
 
-const WBTCDeposit = () => {
+const RequestLoan = () => {
 
   var util = require('util')
 
@@ -171,94 +176,48 @@ const WBTCDeposit = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>
-              <div className="avatar avatar-md">
-                <CImage src={wbtclogo} width={36} height={36} />
-              </div>
-              &nbsp;&nbsp;WBTC Deposits
+              Request for a Loan
             </CCardHeader>
             <CCardBody>
-              <CRow>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol sm={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3">
-                        <div className="text-medium-emphasis small">Utilization Rate</div>
-                        <div className="fs-5 fw-semibold">53%</div>
-                      </div>
-                    </CCol>
-                    <CCol sm={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-medium-emphasis small">Total Deposits</div>
-                        <div className="fs-5 fw-semibold">8,802.78</div>
-                      </div>
-                    </CCol>
-                  </CRow>
-                </CCol>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol sm={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-medium-emphasis small">Current APY &nbsp;&nbsp;</div>
-                        <div className="fs-5 fw-semibold">1.20%</div>
-                      </div>
-                    </CCol>
-                    <CCol sm={6}>
-                      <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-medium-emphasis small">Available Liquidity</div>
-                        <div className="fs-5 fw-semibold">4,165.96</div>
-                      </div>
-                    </CCol>
-                  </CRow>
-                </CCol>
-              </CRow>
-              <br />
-
-              <CRow>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">Current WBTC on deposit:</div>
-                </CCol>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcOnDeposit}</div>
-                </CCol>
-              </CRow>
-              <CRow>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">WBTC balance:</div>
-                </CCol>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcBalance}</div>
-                </CCol>
-              </CRow>
-              <CRow>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">WBTC approved for transfer:</div>
-                </CCol>
-                <CCol sm={6}>
-                  <div className="text-medium-emphasis small">{wbtcAuthorized}</div>
-                </CCol>
-              </CRow>
-              <br />
-              <CForm className="row g-3">
-                <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAuth" placeholder="WBTC to approve" />
+              <CForm>
+                <div className="mb-3">
+                  <CFormSelect aria-label="Default select example">
+                    <option>Choose an asset to borrow</option>
+                    <option value="WBTC">renBTC</option>
+                    <option value="RBTC">WBTC</option>
+                  </CFormSelect>
                 </div>
-                <div className="col-auto">
-                  <CButton type="submit" className="mb-3" variant="outline" onClick={() => handleLenderApproveTransfer()}>
-                    Approve
-                  </CButton>
+                <div className="mb-3">
+                  <CFormLabel>Borrower public key #1</CFormLabel>
+                  <CFormInput type="text" id="pubkey1" aria-describedby="pubkey1help" />
+                  <CFormText id="pubkey1help">This pub key is used for the Bitcoin funding address</CFormText>
                 </div>
+                <div className="mb-3">
+                  <CFormLabel>Borrower public key #2</CFormLabel>
+                  <CFormInput type="text" id="pubkey2" aria-describedby="pubkey2help" />
+                  <CFormText id="pubkey2help">This pub key is used for the Bitcoin vault address</CFormText>
+                </div>
+                <div className="mb-3">
+                  <CFormLabel>Borrower hashed secret</CFormLabel>
+                  <CFormInput type="text" id="hashsecret" aria-describedby="hashSecretHelp" />
+                  <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The borrower reveals the pre-image in order to take control of the funds being borrowed</CFormText>
+                </div>
+                <div className="mb-3">
+                  <CFormLabel>Loan term</CFormLabel>
+                  <CInputGroup className="mb-3">
+                    <CFormInput placeholder="# of days" aria-label="# of days" aria-describedby="basic-addon2"/>
+                    <CInputGroupText id="loanterm">Days</CInputGroupText>
+                  </CInputGroup>
+                </div>
+                <div className="mb-3">
+                  <CFormLabel>Loan amount</CFormLabel>
+                  <CFormInput type="text" id="loanamt" aria-describedby="loanamount" />
+                  <CFormText id="loanamount">The amount to borrow (must be collateralized on Bitcoin network)</CFormText>
+                </div>
+                <CButton type="submit" color="success" variant="outline">
+                  Submit
+                </CButton>
               </CForm>
-              <CForm className="row g-3">
-                <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAmt" placeholder="WBTC to deposit" />
-                </div>
-                <div className="col-auto">
-                  <CButton type="submit" className="mb-3" color="success" variant="outline" onClick={() => handleLenderDeposit()}>
-                    Deposit
-                  </CButton>
-                </div>
-              </CForm>
-
               <br />
             </CCardBody>
           </CCard>
@@ -268,4 +227,4 @@ const WBTCDeposit = () => {
   )
 }
 
-export default WBTCDeposit
+export default RequestLoan

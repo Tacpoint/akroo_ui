@@ -32,7 +32,7 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Borrow',
-    to: '/charts',
+    to: '/requestloan',
     icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
   },
   {
@@ -41,6 +41,11 @@ const _nav = [
     to: '/buttons',
     icon: <CIcon icon={cilChartPie} customClassName="nav-icon" />,
     items: [
+      {
+        component: CNavItem,
+        name: 'renBTC Deposit',
+        to: '/rbtcdeposit',
+      },
       {
         component: CNavItem,
         name: 'WBTC Deposit',
