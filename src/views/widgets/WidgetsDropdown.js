@@ -22,13 +22,13 @@ const WidgetsDropdown = () => {
           color="primary"
           value={
             <>
-              $180M{' '}
+              15,328.8{' '}
               <span className="fs-6 fw-normal">
                 (+12.4% <CIcon icon={cilArrowTop} />)
               </span>
             </>
           }
-          title="Total Deposits"
+          title="WBTC Deposits"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">
@@ -50,7 +50,7 @@ const WidgetsDropdown = () => {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                 datasets: [
                   {
-                    label: 'Total deposits by month',
+                    label: 'WBTC deposits by month',
                     backgroundColor: 'transparent',
                     borderColor: 'rgba(255,255,255,.55)',
                     pointBackgroundColor: getStyle('--cui-primary'),
@@ -109,13 +109,13 @@ const WidgetsDropdown = () => {
           color="info"
           value={
             <>
-              $158.2M{' '}
+              8,210.6{' '}
               <span className="fs-6 fw-normal">
                 (18.9% <CIcon icon={cilArrowTop} />)
               </span>
             </>
           }
-          title="Active Loans"
+          title="RBTC Deposits"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">
@@ -137,7 +137,7 @@ const WidgetsDropdown = () => {
                 labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                 datasets: [
                   {
-                    label: 'Outstanding Loans',
+                    label: 'RBTC deposits by month',
                     backgroundColor: 'transparent',
                     borderColor: 'rgba(255,255,255,.55)',
                     pointBackgroundColor: getStyle('--cui-info'),

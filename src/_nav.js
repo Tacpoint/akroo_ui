@@ -27,7 +27,13 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Components',
+    name: 'Marketplace',
+  },
+  {
+    component: CNavItem,
+    name: 'Borrow',
+    to: '/charts',
+    icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
   },
   {
     component: CNavGroup,
@@ -37,16 +43,26 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Deposit',
+        name: 'WBTC Deposit',
+        to: '/wbtcdeposit',
+      },
+      {
+        component: CNavItem,
+        name: 'Pub Keys / Secrets',
+        to: '/buttons/buttons',
+      },
+      {
+        component: CNavItem,
+        name: 'Withdrawl',
         to: '/buttons/buttons',
       },
     ],
   },
   {
     component: CNavItem,
-    name: 'Borrow',
+    name: 'My Loans',
     to: '/charts',
-    icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilPencil} customClassName="nav-icon" />,
   },
 ]
 

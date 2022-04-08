@@ -11,7 +11,7 @@ import { sygnet } from 'src/assets/brand/sygnet'
 
 import SimpleBar from 'simplebar-react'
 import 'simplebar/dist/simplebar.min.css'
-import logos from '../assets/images/akroo_logo.png'
+import logos from '../assets/images/akroo_logo_white.png'
 
 // sidebar nav config
 import navigation from '../_nav'
