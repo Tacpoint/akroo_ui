@@ -3,3 +3,4 @@ src/contracts/
 src/components/AppHeader.js
 src/views/lend/
 src/views/borrow/
+src/views/loans/

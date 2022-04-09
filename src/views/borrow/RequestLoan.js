@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
+import { useNavigate } from "react-router-dom";
 
 import {
   CImage,
@@ -76,9 +77,14 @@ const RequestLoan = () => {
   const [wbtcOnDeposit, setWbtcOnDeposit] = useState()
   const [wbtcAuthorized, setWbtcAuthorized] = useState()
   const [wbtcBalance, setWbtcBalance] = useState()
+  const navigate = useNavigate();
 
-  const handleLenderDeposit = async () => {
+  const handleLoanRequest = async () => {
 
+    navigate('/rbtcdeposit', { replace: true });
+
+    
+    /*
     const depositAmt = document.querySelector('#wbtcAmt');
     console.log('deposit amt : ', depositAmt.value)
 
@@ -109,37 +115,7 @@ const RequestLoan = () => {
     catch (err) {
       alert(err)
     }
-
-  }
-
-  const handleLenderApproveTransfer = async () => {
-
-    const authAmt = document.querySelector('#wbtcAuth');
-    console.log('Auth amt : ', authAmt.value)
-
-    //console.log(util.inspect(depositAmt))
-
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      let userAddress = await signer.getAddress()
-      let bn = ethers.BigNumber.from(authAmt.value)
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const tx = await wbtcContract.approve(loans.LOAN_ADDRESS, bn, {from:userAddress})
-      console.log(`Transaction hash: ${tx.hash}`);
-      const receipt = await tx.wait();
-      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
-
-    }
-    catch (err) {
-      alert(err)
-    }
+    */
 
   }
 
@@ -181,7 +157,7 @@ const RequestLoan = () => {
             <CCardBody>
               <CForm>
                 <div className="mb-3">
-                  <CFormSelect aria-label="Default select example">
+                  <CFormSelect aria-label="Default select example" id="assettype">
                     <option>Choose an asset to borrow</option>
                     <option value="WBTC">renBTC</option>
                     <option value="RBTC">WBTC</option>
@@ -200,7 +176,7 @@ const RequestLoan = () => {
                 <div className="mb-3">
                   <CFormLabel>Borrower hashed secret</CFormLabel>
                   <CFormInput type="text" id="hashsecret" aria-describedby="hashSecretHelp" />
-                  <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The borrower reveals the pre-image in order to take control of the funds being borrowed</CFormText>
+                  <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The borrower reveals the actual secret in order to take control of the funds being borrowed</CFormText>
                 </div>
                 <div className="mb-3">
                   <CFormLabel>Loan term</CFormLabel>
@@ -214,7 +190,7 @@ const RequestLoan = () => {
                   <CFormInput type="text" id="loanamt" aria-describedby="loanamount" />
                   <CFormText id="loanamount">The amount to borrow (must be collateralized on Bitcoin network)</CFormText>
                 </div>
-                <CButton type="submit" color="success" variant="outline">
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
                   Submit
                 </CButton>
               </CForm>

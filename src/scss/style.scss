@@ -15,3 +15,27 @@ $enable-rtl: true;
 
 // If you want to add custom CSS you can put it here.
 @import "custom";
+
+.loanFilterSelect {
+  width: 200px;
+  float: right;
+}
+
+.cardtextwrapper {
+    display: table;
+}
+.keyvaluewrapper {
+    display: table-row;
+}
+.itemkey {
+    display: table-cell;
+    float: left;
+    width: 100px;
+    
+}
+.itemvalue {
+    display: table-cell;
+    float: left;
+    width: 150px;
+    padding-left: 20px;
+}
