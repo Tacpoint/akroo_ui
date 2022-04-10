@@ -50,7 +50,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Pub Keys / Secrets',
-        to: '/buttons/buttons',
+        to: '/pubkeys',
       },
       {
         component: CNavItem,

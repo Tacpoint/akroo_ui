@@ -115,7 +115,7 @@ const Loans = () => {
     for (let i = 0; i <= 10; i++) {
      
       cards.push(
-        <CRow xs={{ cols: 1, gutter: 4 }} md={{ cols: 2, gutter: 4 }} key={i}>
+        <CRow xs={{ cols: 1, gutter: 4 }} md={{ cols: 2, gutter: 4 }} lg={{ cols: 3, gutter: 4 }} key={i}>
           <CCol xs>
               <CCard style={{ width: '18rem' }} className="mb-3">
                 <CCardImage orientation="top" src={cardbg1} />
@@ -133,6 +133,46 @@ const Loans = () => {
                         <div className="itemkey">Loan Status:</div>
                         <div className="itemvalue">{status}</div>
                       </div>                       
+                      <div className="keyvaluewrapper">
+                          <div className="itemkey">Loan Amt:</div>
+                          <div className="itemvalue">{loanAmt}</div>
+                      </div>
+                      <div className="keyvaluewrapper">
+                          <div className="itemkey">Term:</div>
+                          <div className="itemvalue">{term}</div>
+                      </div>   
+                      <div className="keyvaluewrapper">
+                          <div className="itemkey">Due Date:</div>
+                          <div className="itemvalue">{dueDate}</div>
+                      </div>      
+                      <div className="keyvaluewrapper">
+                          <div className="itemkey">Interest Rate:</div>
+                          <div className="itemvalue">{interestRate}</div>
+                      </div>                                                              
+                    </div>
+                    <br/>
+
+                  <CButton href="#"  onClick={() => logFormatErrors()} >Loan Details</CButton>
+                </CCardBody>
+              </CCard>
+          </CCol>
+          <CCol xs>
+              <CCard style={{ width: '18rem' }}>
+                <CCardImage orientation="top" src={cardbg3} />
+                <CCardBody>
+                  <CCardTitle>
+                    <CImage src={rbtclogo} width={36} height={36} />
+                    &nbsp;&nbsp;{rtitle}
+                  </CCardTitle>
+                    <div className="cardtextwrapper">
+                      <div className="keyvaluewrapper">
+                        <div className="itemkey">Loan ID:</div>
+                        <div className="itemvalue">{loanId}</div>
+                      </div> 
+                      <div className="keyvaluewrapper">
+                        <div className="itemkey">Loan Status:</div>
+                        <div className="itemvalue">{status}</div>
+                      </div>                        
                       <div className="keyvaluewrapper">
                           <div className="itemkey">Loan Amt:</div>
                           <div className="itemvalue">{loanAmt}</div>
@@ -214,6 +254,10 @@ const Loans = () => {
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+
+
+
       const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
       console.log('WBTCDeposit - WBTC vault funds balance for account : ',userAddress,' - ', userWbtcVaultFunds.toString())
       setWbtcOnDeposit(userWbtcVaultFunds.toString())

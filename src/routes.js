@@ -3,6 +3,7 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const WBTCDeposit = React.lazy(() => import('./views/lend/WBTCDeposit'))
 const RBTCDeposit = React.lazy(() => import('./views/lend/RBTCDeposit'))
+const PubKeys = React.lazy(() => import('./views/lend/PubKeys'))
 const RequestLoan = React.lazy(() => import('./views/borrow/RequestLoan'))
 const Loans = React.lazy(() => import('./views/loans/Loans'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -59,6 +60,7 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/wbtcdeposit', name: 'WBTC Deposit', element: WBTCDeposit },
   { path: '/rbtcdeposit', name: 'RBTC Deposit', element: RBTCDeposit },
+  { path: '/pubkeys', name: 'Public Keys and Secrets', element: PubKeys },
   { path: '/requestloan', name: 'Request Loan', element: RequestLoan },
   { path: '/loans', name: 'My Loans', element: Loans },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },

@@ -134,12 +134,6 @@ const AppHeader = () => {
               Dashboard
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Borrow</CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Lend</CNavLink>
-          </CNavItem>
         </CHeaderNav>
         <CHeaderNav className="ms-3">
           <CButton ocolor="primary" variant="outline" onClick={() => connectWallet()}>
