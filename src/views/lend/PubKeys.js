@@ -175,11 +175,6 @@ const PubKeys = () => {
         </CCol>
       </CRow>
       <CTable align="middle" className="mb-0 border" hover responsive>
-        <CTableHead color="light">
-          <CTableRow>
-            <CTableHeaderCell></CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
         <CTableBody>
         {renderKeys()}
         </CTableBody>

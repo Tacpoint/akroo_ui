@@ -58,8 +58,8 @@ const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/wbtcdeposit', name: 'WBTC Deposit', element: WBTCDeposit },
-  { path: '/rbtcdeposit', name: 'RBTC Deposit', element: RBTCDeposit },
+  { path: '/wbtcdeposit', name: 'Mangage WBTC Deposits', element: WBTCDeposit },
+  { path: '/rbtcdeposit', name: 'Manage renBTC Deposits', element: RBTCDeposit },
   { path: '/pubkeys', name: 'Public Keys and Secrets', element: PubKeys },
   { path: '/requestloan', name: 'Request Loan', element: RequestLoan },
   { path: '/loans', name: 'My Loans', element: Loans },

@@ -39,23 +39,18 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'renBTC Deposit',
+        name: 'renBTC',
         to: '/rbtcdeposit',
       },
       {
         component: CNavItem,
-        name: 'WBTC Deposit',
+        name: 'WBTC',
         to: '/wbtcdeposit',
       },
       {
         component: CNavItem,
         name: 'Pub Keys / Secrets',
         to: '/pubkeys',
-      },
-      {
-        component: CNavItem,
-        name: 'Withdrawl',
-        to: '/buttons/buttons',
       },
     ],
   },

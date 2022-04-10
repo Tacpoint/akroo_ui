@@ -72,6 +72,40 @@ const WBTCDeposit = () => {
   const [wbtcAuthorized, setWbtcAuthorized] = useState()
   const [wbtcBalance, setWbtcBalance] = useState()
 
+  const handleLenderWithdraw = async () => {
+
+    const wAmt = document.querySelector('#wbtcAmtToWithdraw');
+    console.log('withdrawal amt : ', wAmt.value)
+
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      let bn = ethers.BigNumber.from(wAmt.value)
+      const tx = await loanContract.withdraw(loans.WBTC_ADDRESS, bn, {from:userAddress})
+      console.log(`Transaction hash: ${tx.hash}`);
+      const receipt = await tx.wait();
+      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
+      setWbtcOnDeposit(userWbtcVaultFunds.toString())
+
+      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
+      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
+      setWbtcBalance(wbtcBalance.toString())
+      setWbtcAuthorized(wbtcAuthAmt.toString())
+
+    }
+    catch (err) {
+      alert(err)
+    }
+
+  }
+
   const handleLenderDeposit = async () => {
 
     const depositAmt = document.querySelector('#wbtcAmt');
@@ -244,7 +278,7 @@ const WBTCDeposit = () => {
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" variant="outline" onClick={() => handleLenderApproveTransfer()}>
-                    Approve
+                    Approve&nbsp;&nbsp;
                   </CButton>
                 </div>
               </CForm>
@@ -254,7 +288,17 @@ const WBTCDeposit = () => {
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" color="success" variant="outline" onClick={() => handleLenderDeposit()}>
-                    Deposit
+                    Deposit&nbsp;&nbsp;&nbsp;
+                  </CButton>
+                </div>
+              </CForm>
+              <CForm className="row g-3">
+                <div className="col-sm-6">
+                  <CFormInput type="text" id="wbtcAmtToWithdraw" placeholder="WBTC to withdraw" />
+                </div>
+                <div className="col-auto">
+                  <CButton type="submit" className="mb-3" color="danger" variant="outline" onClick={() => handleLenderWithdraw()}>
+                    Withdraw
                   </CButton>
                 </div>
               </CForm>

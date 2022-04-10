@@ -72,6 +72,43 @@ const RBTCDeposit = () => {
   const [rbtcAuthorized, setRbtcAuthorized] = useState()
   const [rbtcBalance, setRbtcBalance] = useState()
 
+  const rbtcToApproveLabel = 'renBTC to approve'
+  const rbtcToDepositLabel = 'renBTC to deposit'
+  const rbtcToWithdrawLabel = 'renBTC to withdraw'
+
+  const handleLenderWithdrawal = async () => {
+
+    const withdrawalAmt = document.querySelector('#rbtcAmtToWithdrawal');
+    console.log('withdrawal amt : ', withdrawalAmt.value)
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      let bn = ethers.BigNumber.from(withdrawalAmt.value)
+      const tx = await loanContract.withdraw(loans.RBTC_ADDRESS, bn, {from:userAddress})
+      console.log(`Transaction hash: ${tx.hash}`);
+      const receipt = await tx.wait();
+      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
+      setRbtcOnDeposit(userRbtcVaultFunds.toString())
+
+      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
+      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
+      setRbtcBalance(rbtcBalance.toString())
+      setRbtcAuthorized(rbtcAuthAmt.toString())
+
+    }
+    catch (err) {
+      alert(err)
+    }
+
+  }
+
   const handleLenderDeposit = async () => {
 
     const depositAmt = document.querySelector('#rbtcAmt');
@@ -240,21 +277,31 @@ const RBTCDeposit = () => {
               <br />
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="rbtcAuth" placeholder="renBTC to approve" />
+                  <CFormInput type="text" id="rbtcAuth" placeholder={rbtcToApproveLabel} />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" variant="outline" onClick={() => handleLenderApproveTransfer()}>
-                    Approve
+                    Approve&nbsp;&nbsp;
                   </CButton>
                 </div>
               </CForm>
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="rbtcAmt" placeholder="renBTC to deposit" />
+                  <CFormInput type="text" id="rbtcAmt" placeholder={rbtcToDepositLabel} />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" color="success" variant="outline" onClick={() => handleLenderDeposit()}>
-                    Deposit
+                    Deposit&nbsp;&nbsp;&nbsp;
+                  </CButton>
+                </div>
+              </CForm>
+              <CForm className="row g-3">
+                <div className="col-sm-6">
+                  <CFormInput type="text" id="rbtcAmtToWithdrawal" placeholder={rbtcToWithdrawLabel} />
+                </div>
+                <div className="col-auto">
+                  <CButton type="submit" className="mb-3" color="danger" variant="outline" onClick={() => handleLenderWithdrawal()}>
+                    Withdraw
                   </CButton>
                 </div>
               </CForm>
