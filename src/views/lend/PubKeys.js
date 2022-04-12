@@ -109,7 +109,7 @@ const PubKeys = () => {
       keys.push(
 
       <CTableRow v-for="item in tableItems" key={i} color="light">
-        <CTableDataCell>
+        <CTableDataCell class="pubkeylabels">
           <div>Public Key #1 </div>
           <div>Public Key #2 </div>
           <div>Hashed Secret </div>
