@@ -83,11 +83,14 @@ const PubKeys = () => {
 
   var util = require('util')
 
+
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
   const [wbtcOnDeposit, setWbtcOnDeposit] = useState()
   const [wbtcAuthorized, setWbtcAuthorized] = useState()
   const [wbtcBalance, setWbtcBalance] = useState()
+  const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
+
   const navigate = useNavigate();
 
   const logFormatErrors = async () => {
@@ -104,12 +107,14 @@ const PubKeys = () => {
     let secret = '0x93c94bae9cbde81229579d80c68e54e77b1271837ddaf2ffe0fd29d0916eb41b';
     let loanId = 'some loan id ...';
 
+    if (!isMetamaskConnected) return keys;
+
     for (let i = 0; i <= 10; i++) {
      
       keys.push(
 
       <CTableRow v-for="item in tableItems" key={i} color="light">
-        <CTableDataCell class="pubkeylabels">
+        <CTableDataCell className="pubkeylabels">
           <div>Public Key #1 </div>
           <div>Public Key #2 </div>
           <div>Hashed Secret </div>
@@ -132,19 +137,38 @@ const PubKeys = () => {
   }
 
   useEffect(() => {
-    console.log('AppHeader useEffect being called')
-    if (!window.ethereum) {
-      alert('Please connect wallet!')
-    }
 
     (async () => {
+
+      console.log('PubKeys useEffect being called')
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("PubKeys - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("PubKeys - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         return;
+      }
+
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
-
-
-
 
       const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
       console.log('WBTCDeposit - WBTC vault funds balance for account : ',userAddress,' - ', userWbtcVaultFunds.toString())
@@ -169,7 +193,9 @@ const PubKeys = () => {
           <CCard className="mb-4">
             <CCardHeader>
               My Public Keys and Secrets
+              {isMetamaskConnected && 
               <CButton href="#"  onClick={() => logFormatErrors()} className="loanFilterSelect"  size="sm">Add Keys / Secret</CButton>
+              }
             </CCardHeader>
           </CCard>
         </CCol>

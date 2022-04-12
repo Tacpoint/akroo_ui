@@ -71,6 +71,7 @@ const RBTCDeposit = () => {
   const [rbtcOnDeposit, setRbtcOnDeposit] = useState()
   const [rbtcAuthorized, setRbtcAuthorized] = useState()
   const [rbtcBalance, setRbtcBalance] = useState()
+  const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
 
   const rbtcToApproveLabel = 'renBTC to approve'
   const rbtcToDepositLabel = 'renBTC to deposit'
@@ -176,12 +177,34 @@ const RBTCDeposit = () => {
   }
 
   useEffect(() => {
-    console.log('AppHeader useEffect being called')
-    if (!window.ethereum) {
-      alert('Please connect wallet!')
-    }
 
     (async () => {
+
+      console.log('RBTCDeposit useEffect being called')
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("RBTCDeposit - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("RBTCDeposit - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         return;
+      }
+
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
@@ -249,7 +272,8 @@ const RBTCDeposit = () => {
                 </CCol>
               </CRow>
               <br />
-
+              {isMetamaskConnected === true &&
+              <div>
               <CRow>
                 <CCol sm={6}>
                   <div className="text-medium-emphasis small">Current renBTC on deposit:</div>
@@ -305,6 +329,8 @@ const RBTCDeposit = () => {
                   </CButton>
                 </div>
               </CForm>
+              </div>
+              }
 
               <br />
             </CCardBody>

@@ -76,6 +76,7 @@ const RequestLoan = () => {
 
   const [wbtcTokenAddress, setWbtcTokenAddress] = useState()
   const [rbtcTokenAddress, setRbtcTokenAddress] = useState()
+  const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
 
   const navigate = useNavigate();
 
@@ -157,12 +158,32 @@ const RequestLoan = () => {
 
   useEffect(() => {
 
-    console.log('RequestLoan useEffect being called')
-    if (!window.ethereum) {
-      alert('Please connect wallet!')
-    }
-
     (async () => {
+      console.log('RequestLoan useEffect being called')
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("RequestLoan - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("RequestLoan - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         return;
+      }
+
       setWbtcTokenAddress(loans.WBTC_ADDRESS)
       setRbtcTokenAddress(loans.RBTC_ADDRESS)
     })()
@@ -176,6 +197,7 @@ const RequestLoan = () => {
             <CCardHeader>
               Request for a Loan
             </CCardHeader>
+            {isMetamaskConnected &&
             <CCardBody>
               <CForm>
                 <div className="mb-3">
@@ -218,6 +240,7 @@ const RequestLoan = () => {
               </CForm>
               <br />
             </CCardBody>
+            }
           </CCard>
         </CCol>
       </CRow>

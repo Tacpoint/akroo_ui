@@ -28,6 +28,8 @@ const AppHeader = () => {
   const [walletButtonLabel, setWalletButtonLabel] = useState()
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const [isMetamaskConnected, setIsMetamaskConnected] = useState()
+
   const [data, setdata] = useState({
     address: '',
     Balance: null,
@@ -76,17 +78,23 @@ const AppHeader = () => {
   }
   const checkIfConnected = (accounts) => {
     if (!accounts) {
-      //if (accounts.length === 0) {
       setWalletButtonLabel('Connect Wallet')
-    } else {
-      connectWallet()
+      console.log("AppHeader - no accounts found for metamask!");
+      setIsMetamaskConnected(false);
+    } 
+    else {
+       connectWallet();
     }
   }
+
   useEffect(() => {
     console.log('AppHeader useEffect being called')
     if (window.ethereum) {
       window.ethereum.request({ method: 'eth_accounts' }).then((res) => checkIfConnected(res[0]))
       //getBlockNumber()
+    }
+    if (!isMetamaskConnected) {
+       return;
     }
 
     (async () => {

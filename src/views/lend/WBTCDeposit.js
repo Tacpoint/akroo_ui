@@ -71,6 +71,7 @@ const WBTCDeposit = () => {
   const [wbtcOnDeposit, setWbtcOnDeposit] = useState()
   const [wbtcAuthorized, setWbtcAuthorized] = useState()
   const [wbtcBalance, setWbtcBalance] = useState()
+  const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
 
   const handleLenderWithdraw = async () => {
 
@@ -173,12 +174,34 @@ const WBTCDeposit = () => {
   }
 
   useEffect(() => {
-    console.log('AppHeader useEffect being called')
-    if (!window.ethereum) {
-      alert('Please connect wallet!')
-    }
 
     (async () => {
+
+      console.log('WBTCDeposit useEffect being called')
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("WBTCDeposit - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+      
+      console.log("WBTCDeposit - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         return;
+      } 
+    
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner()
       let userAddress = await signer.getAddress()
@@ -247,6 +270,8 @@ const WBTCDeposit = () => {
               </CRow>
               <br />
 
+              {isMetamaskConnected === true && 
+              <div>
               <CRow>
                 <CCol sm={6}>
                   <div className="text-medium-emphasis small">Current WBTC on deposit:</div>
@@ -302,6 +327,9 @@ const WBTCDeposit = () => {
                   </CButton>
                 </div>
               </CForm>
+              </div>
+              }
+
 
               <br />
             </CCardBody>
