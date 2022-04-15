@@ -2,7 +2,39 @@ export const loans = {
   LOAN_ADDRESS: "0xCfEB869F69431e42cdB54A4F4f105C19C080A601",
   WBTC_ADDRESS: "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B",
   RBTC_ADDRESS: "0xC89Ce4735882C9F0f0FE26686c53074E09B0D550",
+  
   abi: [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "lender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "batchedLenderKeys1",
+          "type": "string[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "string[]",
+          "name": "batchedLenderKeys2",
+          "type": "string[]"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32[]",
+          "name": "batchedLenderSecrets",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "AddBatchLenderBtcPubKeyAndSecret",
+      "type": "event"
+    },
     {
       "anonymous": false,
       "inputs": [
@@ -153,6 +185,19 @@ export const loans = {
         {
           "indexed": false,
           "internalType": "address",
+          "name": "loanID",
+          "type": "address"
+        }
+      ],
+      "name": "RequestLoan",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "tokenID",
           "type": "address"
         }
@@ -208,6 +253,26 @@ export const loans = {
       "inputs": [
         {
           "internalType": "address",
+          "name": "tokenID",
+          "type": "address"
+        }
+      ],
+      "name": "TotalAvailableFunds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "userID",
           "type": "address"
         },
@@ -228,6 +293,29 @@ export const loans = {
       "stateMutability": "view",
       "type": "function",
       "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string[]",
+          "name": "batchedLenderKeys1",
+          "type": "string[]"
+        },
+        {
+          "internalType": "string[]",
+          "name": "batchedLenderKeys2",
+          "type": "string[]"
+        },
+        {
+          "internalType": "bytes32[]",
+          "name": "batchedLenderSecrets",
+          "type": "bytes32[]"
+        }
+      ],
+      "name": "addBatchLenderBtcPubKeyAndSecret",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
     },
     {
       "inputs": [],
@@ -585,12 +673,77 @@ export const loans = {
           "type": "uint256"
         }
       ],
-      "name": "lenderLoans",
+      "name": "lenderLoan",
       "outputs": [
         {
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "lenderID",
+          "type": "address"
+        }
+      ],
+      "name": "lenderLoans",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "borrowerID",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "loanIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "borrowerLoan",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "borrowerID",
+          "type": "address"
+        }
+      ],
+      "name": "borrowerLoans",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
         }
       ],
       "stateMutability": "view",
@@ -688,6 +841,26 @@ export const loans = {
         }
       ],
       "name": "getLoanLender",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "loanID",
+          "type": "address"
+        }
+      ],
+      "name": "getLoanBorrower",
       "outputs": [
         {
           "internalType": "address",
@@ -904,6 +1077,24 @@ export const loans = {
           "internalType": "address",
           "name": "loanID",
           "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "signedBtcTx",
+          "type": "string"
+        }
+      ],
+      "name": "addBorrowerSignedBtcTx",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "loanID",
+          "type": "address"
         }
       ],
       "name": "loanEscrowAmount",
@@ -1080,6 +1271,20 @@ export const loans = {
         }
       ],
       "name": "claimAbandonmentFee",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "loanID",
+          "type": "address"
+        }
+      ],
+      "name": "claimInvalidSignedTxFee",
       "outputs": [],
       "stateMutability": "payable",
       "type": "function",

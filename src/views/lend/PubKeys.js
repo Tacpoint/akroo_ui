@@ -194,7 +194,7 @@ const PubKeys = () => {
             <CCardHeader>
               My Public Keys and Secrets
               {isMetamaskConnected && 
-              <CButton href="#"  onClick={() => logFormatErrors()} className="loanFilterSelect"  size="sm">Add Keys / Secret</CButton>
+              <CButton href="#/addpubkeys"  className="loanFilterSelect"  size="sm">Add Keys / Secrets</CButton>
               }
             </CCardHeader>
           </CCard>

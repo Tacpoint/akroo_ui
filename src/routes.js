@@ -5,7 +5,9 @@ const WBTCDeposit = React.lazy(() => import('./views/lend/WBTCDeposit'))
 const RBTCDeposit = React.lazy(() => import('./views/lend/RBTCDeposit'))
 const PubKeys = React.lazy(() => import('./views/lend/PubKeys'))
 const RequestLoan = React.lazy(() => import('./views/borrow/RequestLoan'))
+const AddPubKeys = React.lazy(() => import('./views/lend/AddPubKeys'))
 const Loans = React.lazy(() => import('./views/loans/Loans'))
+const LoanDetails = React.lazy(() => import('./views/loans/LoanDetails'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
 
@@ -62,7 +64,9 @@ const routes = [
   { path: '/rbtcdeposit', name: 'Manage renBTC Deposits', element: RBTCDeposit },
   { path: '/pubkeys', name: 'Public Keys and Secrets', element: PubKeys },
   { path: '/requestloan', name: 'Request Loan', element: RequestLoan },
+  { path: '/addpubkeys', name: 'Add Pub Keys and Secrets', element: AddPubKeys },
   { path: '/loans', name: 'My Loans', element: Loans },
+  { path: '/loandetails', name: 'Loan Details', element: LoanDetails },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },

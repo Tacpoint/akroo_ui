@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import {
   CImage,
@@ -79,39 +79,31 @@ import { ethers } from 'ethers'
 import { loans } from 'src/contracts/loans'
 import { wbtc } from 'src/contracts/wbtc'
 
-const Loans = () => {
+const LoanDetails = () => {
 
   var util = require('util')
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false);
-  const [loanTiles, setLoanTiles ] = useState();
+  const [loanTile, setLoanTile ] = useState();
 
   const navigate = useNavigate();
-
-  const navigateToLoanDetails = async function(loanId, isBorrower) {
-
-     console.log("navigateToLoanDetails loan ID : ", loanId, " is borrower : ", isBorrower);
-     
-     //navigate('/loandetails', { loanId: loanId, isBorrower: isBorrower });
-
-     navigate('/loandetails', {
-       state: {
-         loanId: loanId,
-         isBorrower: isBorrower,
-       }
-     });
-
-     //console.log(document.querySelectorAll("p > div"));
-
-  }
-
+  const location = useLocation();
 
   useEffect(() => {
 
     (async () => {
 
+      
+      //console.log("LoanDetails - loan Id passed in : ", location.state.loanId.currentLoanId); 
+      //console.log("LoanDetails - isBorrower flag passed in : ", location.state.isBorrower.isBorrower); 
+
+      let loanId = location.state.loanId.currentLoanId;
+      let isBorrower = location.state.isBorrower.isBorrower;
+
+      console.log("LoanDetails - loan Id passed in : ", loanId); 
+      console.log("LoanDetails - isBorrower flag passed in : ", isBorrower); 
       let cards = [];
 
       let tokenTitle = '';
@@ -120,7 +112,7 @@ const Loans = () => {
       let rtitle = 'renBTC';
       let wtitle = 'WBTC';
 
-      console.log('Loans useEffect being called')
+      console.log('LoanDetails useEffect being called')
 
       if (!window.ethereum) {
         alert('Please connect wallet!')
@@ -131,16 +123,16 @@ const Loans = () => {
       let mmConnected = false;
 
       if (!res[0]) {
-        console.log("Loans - no accounts found for metamask!");
+        console.log("LoanDetails - no accounts found for metamask!");
         setIsMetamaskConnected(false);
       }
       else {
-        console.log("Accounts found - setting metamask connect to true");
+        console.log("LoanDetails Accounts found - setting metamask connect to true");
         setIsMetamaskConnected(true);
         mmConnected = true;
       }
 
-      console.log("Loans - is metamask connected ? "+mmConnected);
+      console.log("LoanDetails - is metamask connected ? "+mmConnected);
 
       if (!mmConnected) {
          alert("Please connect your wallet!");
@@ -161,69 +153,34 @@ const Loans = () => {
       statusMap["6"] = "Escrow to Lender";
       statusMap["7"] = "Abandoned";
 
-      var borrowerLoanMap = {};
-      var lenderLoanMap = {};
-      var combinedLoans = [];
+     const loanDetails =  await loanContract.getLoanDetails(loanId);
 
-      const borrowerLoans = await loanContract.borrowerLoans(userAddress);
-      const lenderLoans = await loanContract.lenderLoans(userAddress);
+     console.log("token Id : ", loanDetails.tokenID);
+     console.log("amount : ", loanDetails.amount.toString());
+     console.log("loan term : ", loanDetails.loanTerm.toString());
+     console.log("borrower hash : ", loanDetails.borrowerHashedSecret);
+     console.log("rate : ", loanDetails.rate.toString());
+     console.log("status : ", statusMap[loanDetails.fundsLocation.toString()]);
+     console.log("loan status expiry date : ", loanDetails.locationExpiryDate.toString());
 
-      for (var i = 0; i < borrowerLoans.length; i++) {
-         borrowerLoanMap[borrowerLoans[i]] = userAddress;
-      }
+     var dueDate = new Date(loanDetails.locationExpiryDate.toNumber());
+     console.log("Due date :", dueDate);
 
-      for (var i = 0; i < lenderLoans.length; i++) {
-         lenderLoanMap[lenderLoans[i]] = userAddress;
-      }
 
-      combinedLoans.push.apply(combinedLoans, borrowerLoans);
-      combinedLoans.push.apply(combinedLoans, lenderLoans);
-      
-
-      for (var i = 0; i < combinedLoans.length; i++) {
-
-         // fetch each loan and create tile for display ...
-         const loanDetails =  await loanContract.getLoanDetails(combinedLoans[i]);
-
-         console.log("loan Id : ", combinedLoans[i]);
-         console.log("token Id : ", loanDetails.tokenID);
-         console.log("amount : ", loanDetails.amount.toString());
-         console.log("loan term : ", loanDetails.loanTerm.toString());
-         console.log("borrower hash : ", loanDetails.borrowerHashedSecret);
-         console.log("rate : ", loanDetails.rate.toString());
-         console.log("status : ", statusMap[loanDetails.fundsLocation.toString()]);
-         console.log("loan status expiry date : ", loanDetails.locationExpiryDate.toString());
-
-         var dueDate = new Date(loanDetails.locationExpiryDate.toNumber());
-         console.log("Due date :", dueDate);
-
-         // want to create a new row for every 3 records ...
-
-         if (loanDetails.tokenID === loans.WBTC_ADDRESS) {
-            tokenTitle = wtitle;
-            tokenImage = wbtclogo;
-         }
-         if (loanDetails.tokenID === loans.RBTC_ADDRESS) {
-            tokenTitle = rtitle;
-            tokenImage = rbtclogo;
-         }
-
-         let abreviatedLoanId = combinedLoans[i].slice(0, 6)
-         abreviatedLoanId = abreviatedLoanId.concat('...')
-         abreviatedLoanId = abreviatedLoanId.concat(combinedLoans[i].slice(combinedLoans[i].length - 4, combinedLoans[i].length))
-
-         let isBorrower = true;
-
-         if (!borrowerLoanMap[combinedLoans[i]]) {
-            isBorrower = false;
-         }
-
-         let currentLoanId = combinedLoans[i].slice();
+     if (loanDetails.tokenID === loans.WBTC_ADDRESS) {
+        tokenTitle = wtitle;
+        tokenImage = wbtclogo;
+     }
+     if (loanDetails.tokenID === loans.RBTC_ADDRESS) {
+        tokenTitle = rtitle;
+        tokenImage = rbtclogo;
+     }
+     
+     let i = 0;
        
          cards.push(
-
-           <CCol xs key={i}>
-               <CCard style={{ width: '18rem' }} className="mb-3">
+           <CCol key={i}>
+               <CCard>
                  <CCardBody>
                    <CCardTitle>
                      <CImage src={tokenImage} width={36} height={36} />
@@ -232,7 +189,7 @@ const Loans = () => {
                      <div className="cardtextwrapper">
                        <div className="keyvaluewrapper">
                          <div className="itemkey">Loan ID:</div>
-                         <div className="itemvalue">{abreviatedLoanId}</div>
+                         <div className="itemvalue-loan-details">{loanId}</div>
                        </div> 
                        <div className="keyvaluewrapper">
                          <div className="itemkey">Loan Status:</div>
@@ -256,22 +213,13 @@ const Loans = () => {
                        </div>                                                              
                      </div>
                    <br/>
-                   <CButton onClick={() => navigateToLoanDetails({currentLoanId}, {isBorrower})} >Loan Details</CButton>
+                   <CButton href="#">Do Something</CButton>
                  </CCardBody>
                </CCard>
            </CCol>
         );
 
-        /*
-        if ( (i%3 === 2)) {
-           cards.push(
-             </CRow>
-           );
-        }
-        */
-      }
-
-      setLoanTiles(cards);
+      setLoanTile(cards);
 
    })()
 
@@ -282,19 +230,13 @@ const Loans = () => {
         <CCol xs>
           <CCard className="mb-4">
             <CCardHeader>
-              My Loans
-              {isMetamaskConnected  &&
-              <CFormSelect aria-label="Loan status filter" size="sm" id="loanstatusfilter" className="loanFilterSelect">
-                <option value="active">Show Active Loans</option>
-                <option value="all">Show All Loans</option>
-              </CFormSelect>
-              }
+              Loan Details
             </CCardHeader>
           </CCard>
         </CCol>
       </CRow>
-      <CRow xs={{ cols: 1, gutter: 4 }} md={{ cols: 2, gutter: 4 }} lg={{ cols: 3, gutter: 4 }}> 
-      {loanTiles}
+      <CRow>
+      {loanTile}
       </CRow>
 
     </>
@@ -302,4 +244,4 @@ const Loans = () => {
 
 }
 
-export default Loans
+export default LoanDetails

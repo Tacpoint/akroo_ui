@@ -68,16 +68,17 @@ const WBTCDeposit = () => {
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
+  const [wbtcAvailableBalance, setWbtcAvailableBalance] = useState()
   const [wbtcOnDeposit, setWbtcOnDeposit] = useState()
   const [wbtcAuthorized, setWbtcAuthorized] = useState()
   const [wbtcBalance, setWbtcBalance] = useState()
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
 
-  const handleLenderWithdraw = async () => {
+  const wbtcToApproveLabel = 'WBTC to approve'
+  const wbtcToDepositLabel = 'WBTC to deposit'
+  const wbtcToWithdrawLabel = 'WBTC to withdraw'
 
-    const wAmt = document.querySelector('#wbtcAmtToWithdraw');
-    console.log('withdrawal amt : ', wAmt.value)
-
+  const refreshBalances = async () => {
 
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -85,20 +86,44 @@ const WBTCDeposit = () => {
       let userAddress = await signer.getAddress()
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
 
-      let bn = ethers.BigNumber.from(wAmt.value)
-      const tx = await loanContract.withdraw(loans.WBTC_ADDRESS, bn, {from:userAddress})
-      console.log(`Transaction hash: ${tx.hash}`);
-      const receipt = await tx.wait();
-      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
       const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
       setWbtcOnDeposit(userWbtcVaultFunds.toString())
+
+      const userWbtcVaultAvailableFunds = await loanContract.UserVaultAvailFunds(userAddress, loans.WBTC_ADDRESS)
+      console.log('WBTCDeposit - WBTC available vault funds balance for account : ',userAddress,' - ', userWbtcVaultAvailableFunds.toString())
+      setWbtcAvailableBalance(userWbtcVaultAvailableFunds.toString())
 
       const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
       const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
       const wbtcBalance = await wbtcContract.balanceOf(userAddress)
       setWbtcBalance(wbtcBalance.toString())
       setWbtcAuthorized(wbtcAuthAmt.toString())
+    }
+    catch (err) {
+      alert(err)
+    }
+
+  }
+
+  const handleLenderWithdrawal = async () => {
+
+    const withdrawalAmt = document.querySelector('#wbtcAmtToWithdrawal');
+    console.log('withdrawal amt : ', withdrawalAmt.value)
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      let bn = ethers.BigNumber.from(withdrawalAmt.value)
+      const tx = await loanContract.withdraw(loans.WBTC_ADDRESS, bn, {from:userAddress})
+      console.log(`Transaction hash: ${tx.hash}`);
+      const receipt = await tx.wait();
+      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+      await refreshBalances();
 
     }
     catch (err) {
@@ -126,14 +151,8 @@ const WBTCDeposit = () => {
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
-      setWbtcOnDeposit(userWbtcVaultFunds.toString())
 
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
+      await refreshBalances();
 
     }
     catch (err) {
@@ -161,10 +180,7 @@ const WBTCDeposit = () => {
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
 
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
+      await refreshBalances();
 
     }
     catch (err) {
@@ -195,29 +211,14 @@ const WBTCDeposit = () => {
         setIsMetamaskConnected(true);
         mmConnected = true;
       }
-      
+
       console.log("WBTCDeposit - is metamask connected ? "+mmConnected);
 
       if (!mmConnected) {
          return;
-      } 
-    
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      let userAddress = await signer.getAddress()
-      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
-      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
-      console.log('WBTCDeposit - WBTC vault funds balance for account : ',userAddress,' - ', userWbtcVaultFunds.toString())
-      setWbtcOnDeposit(userWbtcVaultFunds.toString())
+      }
 
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
-
-      console.log('WBTC balance : ', wbtcBalance.toString())
-      console.log('WBTC auth amt : ', wbtcAuthAmt.toString())
+      await refreshBalances();
 
     })()
 
@@ -269,8 +270,7 @@ const WBTCDeposit = () => {
                 </CCol>
               </CRow>
               <br />
-
-              {isMetamaskConnected === true && 
+              {isMetamaskConnected === true &&
               <div>
               <CRow>
                 <CCol sm={6}>
@@ -278,6 +278,14 @@ const WBTCDeposit = () => {
                 </CCol>
                 <CCol sm={6}>
                   <div className="text-medium-emphasis small">{wbtcOnDeposit}</div>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">Current WBTC available balance (not in loan use):</div>
+                </CCol>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">{wbtcAvailableBalance}</div>
                 </CCol>
               </CRow>
               <CRow>
@@ -299,7 +307,7 @@ const WBTCDeposit = () => {
               <br />
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAuth" placeholder="WBTC to approve" />
+                  <CFormInput type="text" id="wbtcAuth" placeholder={wbtcToApproveLabel} />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" variant="outline" onClick={() => handleLenderApproveTransfer()}>
@@ -309,7 +317,7 @@ const WBTCDeposit = () => {
               </CForm>
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAmt" placeholder="WBTC to deposit" />
+                  <CFormInput type="text" id="wbtcAmt" placeholder={wbtcToDepositLabel} />
                 </div>
                 <div className="col-auto">
                   <CButton type="submit" className="mb-3" color="success" variant="outline" onClick={() => handleLenderDeposit()}>
@@ -319,17 +327,16 @@ const WBTCDeposit = () => {
               </CForm>
               <CForm className="row g-3">
                 <div className="col-sm-6">
-                  <CFormInput type="text" id="wbtcAmtToWithdraw" placeholder="WBTC to withdraw" />
+                  <CFormInput type="text" id="wbtcAmtToWithdrawal" placeholder={wbtcToWithdrawLabel} />
                 </div>
                 <div className="col-auto">
-                  <CButton type="submit" className="mb-3" color="danger" variant="outline" onClick={() => handleLenderWithdraw()}>
+                  <CButton type="submit" className="mb-3" color="danger" variant="outline" onClick={() => handleLenderWithdrawal()}>
                     Withdraw
                   </CButton>
                 </div>
               </CForm>
               </div>
               }
-
 
               <br />
             </CCardBody>

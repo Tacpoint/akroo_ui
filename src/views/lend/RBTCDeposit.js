@@ -68,6 +68,7 @@ const RBTCDeposit = () => {
 
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
+  const [rbtcAvailableBalance, setRbtcAvailableBalance] = useState()
   const [rbtcOnDeposit, setRbtcOnDeposit] = useState()
   const [rbtcAuthorized, setRbtcAuthorized] = useState()
   const [rbtcBalance, setRbtcBalance] = useState()
@@ -76,6 +77,33 @@ const RBTCDeposit = () => {
   const rbtcToApproveLabel = 'renBTC to approve'
   const rbtcToDepositLabel = 'renBTC to deposit'
   const rbtcToWithdrawLabel = 'renBTC to withdraw'
+
+  const refreshBalances = async () => {
+
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
+      setRbtcOnDeposit(userRbtcVaultFunds.toString())
+
+      const userRbtcVaultAvailableFunds = await loanContract.UserVaultAvailFunds(userAddress, loans.RBTC_ADDRESS)
+      console.log('RBTCDeposit - renBTC available vault funds balance for account : ',userAddress,' - ', userRbtcVaultAvailableFunds.toString())
+      setRbtcAvailableBalance(userRbtcVaultAvailableFunds.toString())
+
+      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
+      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
+      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
+      setRbtcBalance(rbtcBalance.toString())
+      setRbtcAuthorized(rbtcAuthAmt.toString())
+    }
+    catch (err) {
+      alert(err)
+    }
+
+  }
 
   const handleLenderWithdrawal = async () => {
 
@@ -94,14 +122,8 @@ const RBTCDeposit = () => {
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
-      setRbtcOnDeposit(userRbtcVaultFunds.toString())
 
-      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
-      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
-      setRbtcBalance(rbtcBalance.toString())
-      setRbtcAuthorized(rbtcAuthAmt.toString())
+      await refreshBalances();
 
     }
     catch (err) {
@@ -129,14 +151,8 @@ const RBTCDeposit = () => {
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
-      setRbtcOnDeposit(userRbtcVaultFunds.toString())
 
-      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
-      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
-      setRbtcBalance(rbtcBalance.toString())
-      setRbtcAuthorized(rbtcAuthAmt.toString())
+      await refreshBalances();
 
     }
     catch (err) {
@@ -164,10 +180,7 @@ const RBTCDeposit = () => {
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
 
-      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
-      setRbtcBalance(rbtcBalance.toString())
-      setRbtcAuthorized(rbtcAuthAmt.toString())
+      await refreshBalances();
 
     }
     catch (err) {
@@ -205,22 +218,7 @@ const RBTCDeposit = () => {
          return;
       }
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner()
-      let userAddress = await signer.getAddress()
-      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
-      const userRbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.RBTC_ADDRESS)
-      console.log('RBTCDeposit - renBTC vault funds balance for account : ',userAddress,' - ', userRbtcVaultFunds.toString())
-      setRbtcOnDeposit(userRbtcVaultFunds.toString())
-
-      const rbtcContract = new ethers.Contract(loans.RBTC_ADDRESS, rbtc.abi, signer)
-      const rbtcAuthAmt = await rbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const rbtcBalance = await rbtcContract.balanceOf(userAddress)
-      setRbtcBalance(rbtcBalance.toString())
-      setRbtcAuthorized(rbtcAuthAmt.toString())
-
-      console.log('renBTC balance : ', rbtcBalance.toString())
-      console.log('renBTC auth amt : ', rbtcAuthAmt.toString())
+      await refreshBalances();
 
     })()
 
@@ -280,6 +278,14 @@ const RBTCDeposit = () => {
                 </CCol>
                 <CCol sm={6}>
                   <div className="text-medium-emphasis small">{rbtcOnDeposit}</div>
+                </CCol>
+              </CRow>
+              <CRow>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">Current renBTC available balance (not in loan use):</div>
+                </CCol>
+                <CCol sm={6}>
+                  <div className="text-medium-emphasis small">{rbtcAvailableBalance}</div>
                 </CCol>
               </CRow>
               <CRow>
