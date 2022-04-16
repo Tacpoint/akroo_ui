@@ -86,10 +86,18 @@ const LoanDetails = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false);
+
+  const [needsBorrowerSignature, setNeedsBorrowerSignature] = useState(true);
+  const [needsBorrowerHash, setNeedsBorrowerHash] = useState(true);
+  const [needsLenderApproval, setNeedsLenderApproval] = useState(true);
+
   const [loanTile, setLoanTile ] = useState();
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const handleLoanRequest = async () => {
+  }
 
   useEffect(() => {
 
@@ -97,13 +105,13 @@ const LoanDetails = () => {
 
       
       //console.log("LoanDetails - loan Id passed in : ", location.state.loanId.currentLoanId); 
-      //console.log("LoanDetails - isBorrower flag passed in : ", location.state.isBorrower.isBorrower); 
+      //console.log("LoanDetails - owner passed in : ", location.state.owner.owner); 
 
       let loanId = location.state.loanId.currentLoanId;
-      let isBorrower = location.state.isBorrower.isBorrower;
+      let owner = location.state.owner.owner;
 
       console.log("LoanDetails - loan Id passed in : ", loanId); 
-      console.log("LoanDetails - isBorrower flag passed in : ", isBorrower); 
+      console.log("LoanDetails - owner value passed in : ", owner); 
       let cards = [];
 
       let tokenTitle = '';
@@ -186,34 +194,58 @@ const LoanDetails = () => {
                      <CImage src={tokenImage} width={36} height={36} />
                      &nbsp;&nbsp;{tokenTitle}
                    </CCardTitle>                
-                     <div className="cardtextwrapper">
-                       <div className="keyvaluewrapper">
-                         <div className="itemkey">Loan ID:</div>
-                         <div className="itemvalue-loan-details">{loanId}</div>
-                       </div> 
-                       <div className="keyvaluewrapper">
-                         <div className="itemkey">Loan Status:</div>
-                         <div className="itemvalue">{statusMap[loanDetails.fundsLocation.toString()]}</div>
-                       </div>                       
-                       <div className="keyvaluewrapper">
-                           <div className="itemkey">Loan Amt:</div>
-                           <div className="itemvalue">{loanDetails.amount.toString()}</div>
-                       </div>
-                       <div className="keyvaluewrapper">
-                           <div className="itemkey">Term:</div>
-                           <div className="itemvalue">{loanDetails.loanTerm.toString()}</div>
-                       </div>   
-                       <div className="keyvaluewrapper">
-                           <div className="itemkey">Due Date:</div>
-                           <div className="itemvalue">{loanDetails.locationExpiryDate.toString()}</div>
-                       </div>      
-                       <div className="keyvaluewrapper">
-                           <div className="itemkey">Interest Rate:</div>
-                           <div className="itemvalue">{loanDetails.rate.toString()}</div>
-                       </div>                                                              
-                     </div>
-                   <br/>
-                   <CButton href="#">Do Something</CButton>
+                     <CTable hover>
+                       <CTableBody>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Loan ID</CTableHeaderCell>
+                           <CTableDataCell>{loanId}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Loan Status</CTableHeaderCell>
+                           <CTableDataCell>{statusMap[loanDetails.fundsLocation.toString()]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Loan Amt</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.amount.toString()}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Term</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.loanTerm.toString()}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Due Date</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.locationExpiryDate.toString()}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Interest Rate</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.rate.toString()}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Secret</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerHashedSecret}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Lender Secret</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.lenderHashedSecret}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Lender Funding Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.lenderBtcPubKeys[0]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Lender Vault Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.lenderBtcPubKeys[1]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Funding Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[0]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Vault Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[1]}</CTableDataCell>
+                         </CTableRow>
+                       </CTableBody>
+                     </CTable>
                  </CCardBody>
                </CCard>
            </CCol>
@@ -227,17 +259,71 @@ const LoanDetails = () => {
   return (
     <>
       <CRow>
+      {loanTile}
+      </CRow>
+      <br/>
+      {isMetamaskConnected && needsBorrowerSignature &&
+      <CRow>
         <CCol xs>
           <CCard className="mb-4">
-            <CCardHeader>
-              Loan Details
-            </CCardHeader>
+            <CCardBody>
+              <CForm>
+                <div className="mb-3">
+                  <CFormLabel>Borrower Funding Tx Signature</CFormLabel>
+                  <CFormInput type="text" id="borrowerSig" aria-describedby="sighelp" />
+                  <CFormText id="sighelp">Signature from the borrower needed by the lender to spend from the funding tx to the vault tx</CFormText>
+                </div>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                  Add Borrower Funding Signature 
+                </CButton>
+              </CForm>
+              <br />
+            </CCardBody>
           </CCard>
         </CCol>
       </CRow>
+      }
+      {isMetamaskConnected &&
       <CRow>
-      {loanTile}
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardBody>
+              <CForm>
+                <div className="mb-3">
+                  <CFormLabel>Borrower Secret</CFormLabel>
+                  <CFormInput type="text" id="borrowerSecret" aria-describedby="borrowerSecretHelp" />
+                  <CFormText id="sighelp">Borrower secret that hashes to the borrower hashed secret.  Providing a valid secret allows the borrower to claim the funds in escrow</CFormText>
+                </div>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                  Claim funds as borrower 
+                </CButton>
+              </CForm>
+              <br />
+            </CCardBody>
+          </CCard>
+        </CCol>
       </CRow>
+      }
+      {isMetamaskConnected &&
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardBody>
+              <CForm>
+                <div className="mb-3">
+                  <CFormLabel>Lender approval of funds for release to borrower</CFormLabel>
+                  <CFormText id="lenderReleaseEscrowHelp">After the lender verifies the borrower funding tx signature, they use this action to approve funds to be claimed by the borrower if the borrower provides secret which hashes to the borrower secret hash used when applying for the loan</CFormText>
+                </div>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                  Lender Approval
+                </CButton>
+              </CForm>
+              <br />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+      }
 
     </>
   )

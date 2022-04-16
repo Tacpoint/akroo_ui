@@ -90,16 +90,16 @@ const Loans = () => {
 
   const navigate = useNavigate();
 
-  const navigateToLoanDetails = async function(loanId, isBorrower) {
+  const navigateToLoanDetails = async function(loanId, owner) {
 
-     console.log("navigateToLoanDetails loan ID : ", loanId, " is borrower : ", isBorrower);
+     console.log("navigateToLoanDetails loan ID : ", loanId, " owner : ", owner);
      
-     //navigate('/loandetails', { loanId: loanId, isBorrower: isBorrower });
+     //navigate('/loandetails', { loanId: loanId, owner: owner });
 
      navigate('/loandetails', {
        state: {
          loanId: loanId,
-         isBorrower: isBorrower,
+         owner: owner,
        }
      });
 
@@ -111,6 +111,12 @@ const Loans = () => {
   useEffect(() => {
 
     (async () => {
+
+      let OWNER_BORROWER = 'BORROWER';
+      let OWNER_LENDER = 'LENDER';
+      let OWNER_BOTH = 'BOTH';
+
+      let owner = '';
 
       let cards = [];
 
@@ -212,10 +218,14 @@ const Loans = () => {
          abreviatedLoanId = abreviatedLoanId.concat('...')
          abreviatedLoanId = abreviatedLoanId.concat(combinedLoans[i].slice(combinedLoans[i].length - 4, combinedLoans[i].length))
 
-         let isBorrower = true;
-
-         if (!borrowerLoanMap[combinedLoans[i]]) {
-            isBorrower = false;
+         if (borrowerLoanMap[combinedLoans[i]] && lenderLoanMap[combinedLoans[i]]) {
+            owner = OWNER_BOTH;
+         }
+         else if (borrowerLoanMap[combinedLoans[i]]) {
+            owner = OWNER_BORROWER;
+         }
+         else {
+            owner = OWNER_LENDER;
          }
 
          let currentLoanId = combinedLoans[i].slice();
@@ -256,7 +266,7 @@ const Loans = () => {
                        </div>                                                              
                      </div>
                    <br/>
-                   <CButton onClick={() => navigateToLoanDetails({currentLoanId}, {isBorrower})} >Loan Details</CButton>
+                   <CButton onClick={() => navigateToLoanDetails({currentLoanId}, {owner})} >Loan Details</CButton>
                  </CCardBody>
                </CCard>
            </CCol>

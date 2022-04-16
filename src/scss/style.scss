@@ -43,8 +43,15 @@ $enable-rtl: true;
     width: 150px;
     padding-left: 20px;
 }
+.itemkey-loan-details {
+    display: table-cell;
+    float: left;
+    width: 200px;
+    
+}
 .itemvalue-loan-details {
     display: table-cell;
+    width: 750px;
     float: left;
     padding-left: 20px;
 }

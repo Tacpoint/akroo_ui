@@ -297,6 +297,31 @@ export const loans = {
     {
       "inputs": [
         {
+          "internalType": "address",
+          "name": "userID",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenID",
+          "type": "address"
+        }
+      ],
+      "name": "UserVaultAvailFunds",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
           "internalType": "string[]",
           "name": "batchedLenderKeys1",
           "type": "string[]"
@@ -408,6 +433,26 @@ export const loans = {
       "inputs": [
         {
           "internalType": "address",
+          "name": "loanID",
+          "type": "address"
+        }
+      ],
+      "name": "getLenderBtcPubKeyPair",
+      "outputs": [
+        {
+          "internalType": "string[2]",
+          "name": "",
+          "type": "string[2]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "LenderID",
           "type": "address"
         }
@@ -432,32 +477,12 @@ export const loans = {
           "type": "address"
         }
       ],
-      "name": "getLenderSecret",
+      "name": "getLenderHashedSecret",
       "outputs": [
         {
           "internalType": "bytes32",
           "name": "",
           "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "lenderID",
-          "type": "address"
-        }
-      ],
-      "name": "getNextLenderBtcPubKeyPair",
-      "outputs": [
-        {
-          "internalType": "string[2]",
-          "name": "",
-          "type": "string[2]"
         }
       ],
       "stateMutability": "view",
@@ -632,6 +657,26 @@ export const loans = {
     {
       "inputs": [
         {
+          "internalType": "bytes32",
+          "name": "secret",
+          "type": "bytes32"
+        }
+      ],
+      "name": "shaify",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
           "internalType": "address",
           "name": "newOwner",
           "type": "address"
@@ -666,31 +711,6 @@ export const loans = {
           "internalType": "address",
           "name": "lenderID",
           "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "loanIndex",
-          "type": "uint256"
-        }
-      ],
-      "name": "lenderLoan",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "lenderID",
-          "type": "address"
         }
       ],
       "name": "lenderLoans",
@@ -699,31 +719,6 @@ export const loans = {
           "internalType": "address[]",
           "name": "",
           "type": "address[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "borrowerID",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "loanIndex",
-          "type": "uint256"
-        }
-      ],
-      "name": "borrowerLoan",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -793,6 +788,11 @@ export const loans = {
               "type": "bytes32"
             },
             {
+              "internalType": "string[2]",
+              "name": "lenderBtcPubKeys",
+              "type": "string[2]"
+            },
+            {
               "internalType": "address",
               "name": "borrower",
               "type": "address"
@@ -806,6 +806,11 @@ export const loans = {
               "internalType": "bytes32",
               "name": "borrowerSecret",
               "type": "bytes32"
+            },
+            {
+              "internalType": "string[2]",
+              "name": "borrowerBtcPubKeys",
+              "type": "string[2]"
             },
             {
               "internalType": "uint256",
@@ -826,66 +831,6 @@ export const loans = {
           "internalType": "struct Loans.Loan",
           "name": "",
           "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "loanID",
-          "type": "address"
-        }
-      ],
-      "name": "getLoanLender",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "loanID",
-          "type": "address"
-        }
-      ],
-      "name": "getLoanBorrower",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "loanID",
-          "type": "address"
-        }
-      ],
-      "name": "getBorrowerHashedSecret",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
         }
       ],
       "stateMutability": "view",
@@ -1158,26 +1103,6 @@ export const loans = {
     {
       "inputs": [
         {
-          "internalType": "bytes32",
-          "name": "secret",
-          "type": "bytes32"
-        }
-      ],
-      "name": "shaify",
-      "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "",
-          "type": "bytes32"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "loanID",
           "type": "address"
@@ -1289,31 +1214,6 @@ export const loans = {
       "stateMutability": "payable",
       "type": "function",
       "payable": true
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "userID",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "tokenID",
-          "type": "address"
-        }
-      ],
-      "name": "UserVaultAvailFunds",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function",
-      "constant": true
     }
   ],
 };
