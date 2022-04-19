@@ -87,9 +87,11 @@ const LoanDetails = () => {
 
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false);
 
-  const [needsBorrowerSignature, setNeedsBorrowerSignature] = useState(true);
-  const [needsBorrowerHash, setNeedsBorrowerHash] = useState(true);
-  const [needsLenderApproval, setNeedsLenderApproval] = useState(true);
+  const [needsBorrowerSignature, setNeedsBorrowerSignature] = useState(false);
+  const [needsBorrowerHash, setNeedsBorrowerHash] = useState(false);
+  const [needsLenderApproval, setNeedsLenderApproval] = useState(false);
+
+  const [currentLoanId, setCurrentLoanId] = useState('');
 
   const [loanTile, setLoanTile ] = useState();
 
@@ -97,6 +99,167 @@ const LoanDetails = () => {
   const location = useLocation();
 
   const handleLoanRequest = async () => {
+  }
+
+  const handleBorrowerClaimFunds = async () => {
+
+      console.log('LoanDetails handleBorrowerClaimFunds being called')
+      const borrowerSecret = document.querySelector('#borrowerSecret');
+      console.log("Borrower secret : ", borrowerSecret.value);
+
+      let borrowerSecretHex = '0x'+borrowerSecret.value;
+
+      console.log("Current loan Id : ", currentLoanId);
+
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("LoanDetails - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("LoanDetails Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("LoanDetails - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         alert("Please connect your wallet!");
+         return;
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      try {
+         const tx = await loanContract.claimLoanEscrowFunds(currentLoanId, borrowerSecretHex, {from:userAddress});
+         console.log("tx object : "+JSON.stringify(tx));
+         console.log(`Transaction hash: ${tx.hash}`);
+         const receipt = await tx.wait();
+         console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+         console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      }
+      catch (err) {
+         console.log("Error : ", err);
+         console.log("Error msg : ", err.data.message);
+         alert("Error msg : "+err.data.message);
+      }
+  }
+
+  const handleLenderApproveFundsRelease = async () => {
+
+      console.log('LoanDetails handleLenderApproveFundsRelease being called')
+
+      console.log("Current loan Id : ", currentLoanId);
+
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("LoanDetails - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("LoanDetails Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("LoanDetails - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         alert("Please connect your wallet!");
+         return;
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      try {
+         const tx = await loanContract.fundLoanEscrow(currentLoanId, {from:userAddress});
+         console.log("tx object : "+JSON.stringify(tx));
+         console.log(`Transaction hash: ${tx.hash}`);
+         const receipt = await tx.wait();
+         console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+         console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      }
+      catch (err) {
+         console.log("Error : ", err);
+         console.log("Error msg : ", err.data.message);
+         alert("Error msg : "+err.data.message);
+      }
+  }
+
+  const handleAddBorrowerSig = async () => {
+
+      console.log('LoanDetails handleAddBorrowerSig being called')
+      const borrowerSig = document.querySelector('#borrowerSig');
+
+      console.log("Borrower signature : ", borrowerSig.value);
+      console.log("Current loan Id : ", currentLoanId);
+
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("LoanDetails - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("LoanDetails Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("LoanDetails - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         alert("Please connect your wallet!");
+         return;
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      try {
+         const tx = await loanContract.addBorrowerSignedBtcTx(currentLoanId, borrowerSig.value, {from:userAddress});
+         console.log("tx object : "+JSON.stringify(tx));
+         console.log(`Transaction hash: ${tx.hash}`);
+         const receipt = await tx.wait();
+         console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+         console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      }
+      catch (err) {
+         console.log("Error : ", err);
+         console.log("Error msg : ", err.data.message);
+         alert("Error msg : "+err.data.message);
+      }
+
+
   }
 
   useEffect(() => {
@@ -108,6 +271,8 @@ const LoanDetails = () => {
       //console.log("LoanDetails - owner passed in : ", location.state.owner.owner); 
 
       let loanId = location.state.loanId.currentLoanId;
+      setCurrentLoanId(loanId);
+
       let owner = location.state.owner.owner;
 
       console.log("LoanDetails - loan Id passed in : ", loanId); 
@@ -174,7 +339,16 @@ const LoanDetails = () => {
      var dueDate = new Date(loanDetails.locationExpiryDate.toNumber());
      console.log("Due date :", dueDate);
 
-
+     if (loanDetails.fundsLocation.toString() === "1") {
+        setNeedsBorrowerSignature(true);
+     }
+     if (loanDetails.fundsLocation.toString() === "2") {
+        setNeedsLenderApproval(true);
+     }
+     if (loanDetails.fundsLocation.toString() === "3") {
+        setNeedsBorrowerHash(true);
+     }
+        
      if (loanDetails.tokenID === loans.WBTC_ADDRESS) {
         tokenTitle = wtitle;
         tokenImage = wbtclogo;
@@ -189,12 +363,14 @@ const LoanDetails = () => {
          cards.push(
            <CCol key={i}>
                <CCard>
-                 <CCardBody>
-                   <CCardTitle>
+                 <CCardHeader>
+                   <div className="avatar avatar-md">
                      <CImage src={tokenImage} width={36} height={36} />
-                     &nbsp;&nbsp;{tokenTitle}
-                   </CCardTitle>                
-                     <CTable hover>
+                   </div>
+                   &nbsp;&nbsp;{tokenTitle}
+                 </CCardHeader>
+                 <CCardBody>
+                     <CTable hover responsive>
                        <CTableBody>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Loan ID</CTableHeaderCell>
@@ -222,7 +398,7 @@ const LoanDetails = () => {
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Borrower Secret</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.borrowerHashedSecret}</CTableDataCell>
+                           <CTableDataCell scope="row">{loanDetails.borrowerHashedSecret}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Lender Secret</CTableHeaderCell>
@@ -273,7 +449,7 @@ const LoanDetails = () => {
                   <CFormInput type="text" id="borrowerSig" aria-describedby="sighelp" />
                   <CFormText id="sighelp">Signature from the borrower needed by the lender to spend from the funding tx to the vault tx</CFormText>
                 </div>
-                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleAddBorrowerSig()}>
                   Add Borrower Funding Signature 
                 </CButton>
               </CForm>
@@ -283,7 +459,7 @@ const LoanDetails = () => {
         </CCol>
       </CRow>
       }
-      {isMetamaskConnected &&
+      {isMetamaskConnected && needsBorrowerHash &&
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
@@ -294,7 +470,7 @@ const LoanDetails = () => {
                   <CFormInput type="text" id="borrowerSecret" aria-describedby="borrowerSecretHelp" />
                   <CFormText id="sighelp">Borrower secret that hashes to the borrower hashed secret.  Providing a valid secret allows the borrower to claim the funds in escrow</CFormText>
                 </div>
-                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleBorrowerClaimFunds()}>
                   Claim funds as borrower 
                 </CButton>
               </CForm>
@@ -304,7 +480,7 @@ const LoanDetails = () => {
         </CCol>
       </CRow>
       }
-      {isMetamaskConnected &&
+      {isMetamaskConnected && needsLenderApproval &&
       <CRow>
         <CCol xs>
           <CCard className="mb-4">
@@ -314,7 +490,7 @@ const LoanDetails = () => {
                   <CFormLabel>Lender approval of funds for release to borrower</CFormLabel>
                   <CFormText id="lenderReleaseEscrowHelp">After the lender verifies the borrower funding tx signature, they use this action to approve funds to be claimed by the borrower if the borrower provides secret which hashes to the borrower secret hash used when applying for the loan</CFormText>
                 </div>
-                <CButton type="submit" color="success" variant="outline" onClick={() => handleLoanRequest()}>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleLenderApproveFundsRelease()}>
                   Lender Approval
                 </CButton>
               </CForm>
