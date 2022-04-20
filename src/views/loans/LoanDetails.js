@@ -90,8 +90,12 @@ const LoanDetails = () => {
   const [needsBorrowerSignature, setNeedsBorrowerSignature] = useState(false);
   const [needsBorrowerHash, setNeedsBorrowerHash] = useState(false);
   const [needsLenderApproval, setNeedsLenderApproval] = useState(false);
+  const [needsBorrowerPayback, setNeedsBorrowerPayback] = useState(false);
 
   const [currentLoanId, setCurrentLoanId] = useState('');
+  const [loanPayoff, setLoanPayoff] = useState('');
+  const [borrowerPreImage, setBorrowerPreImage] = useState('');
+  const [lenderPreImage, setLenderPreImage] = useState('');
 
   const [loanTile, setLoanTile ] = useState();
 
@@ -99,6 +103,55 @@ const LoanDetails = () => {
   const location = useLocation();
 
   const handleLoanRequest = async () => {
+  }
+
+  const handleBorrowerPayback = async () => {
+
+      console.log('LoanDetails handleBorrowerPayback being called')
+
+      if (!window.ethereum) {
+        alert('Please connect wallet!')
+        return;
+      }
+
+      let res = await window.ethereum.request({ method: 'eth_accounts' });
+      let mmConnected = false;
+
+      if (!res[0]) {
+        console.log("LoanDetails - no accounts found for metamask!");
+        setIsMetamaskConnected(false);
+      }
+      else {
+        console.log("LoanDetails Accounts found - setting metamask connect to true");
+        setIsMetamaskConnected(true);
+        mmConnected = true;
+      }
+
+      console.log("LoanDetails - is metamask connected ? "+mmConnected);
+
+      if (!mmConnected) {
+         alert("Please connect your wallet!");
+         return;
+      }
+
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner()
+      let userAddress = await signer.getAddress()
+      const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
+
+      try {
+         const tx = await loanContract.fundRepaymentEscrow(currentLoanId, {from:userAddress});
+         console.log("tx object : "+JSON.stringify(tx));
+         console.log(`Transaction hash: ${tx.hash}`);
+         const receipt = await tx.wait();
+         console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
+         console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      }
+      catch (err) {
+         console.log("Error : ", err);
+         console.log("Error msg : ", err.data.message);
+         alert("Error msg : "+err.data.message);
+      }
   }
 
   const handleBorrowerClaimFunds = async () => {
@@ -193,7 +246,7 @@ const LoanDetails = () => {
       const loanContract = new ethers.Contract(loans.LOAN_ADDRESS, loans.abi, signer)
 
       try {
-         const tx = await loanContract.fundLoanEscrow(currentLoanId, {from:userAddress});
+         const tx = await loanContract.error.fundLoanEscrow(currentLoanId, {from:userAddress});
          console.log("tx object : "+JSON.stringify(tx));
          console.log(`Transaction hash: ${tx.hash}`);
          const receipt = await tx.wait();
@@ -327,6 +380,7 @@ const LoanDetails = () => {
       statusMap["7"] = "Abandoned";
 
      const loanDetails =  await loanContract.getLoanDetails(loanId);
+     console.log("Loan Details : ", JSON.stringify(loanDetails));
 
      console.log("token Id : ", loanDetails.tokenID);
      console.log("amount : ", loanDetails.amount.toString());
@@ -336,7 +390,9 @@ const LoanDetails = () => {
      console.log("status : ", statusMap[loanDetails.fundsLocation.toString()]);
      console.log("loan status expiry date : ", loanDetails.locationExpiryDate.toString());
 
-     var dueDate = new Date(loanDetails.locationExpiryDate.toNumber());
+     var dueDate = new Date();
+     dueDate.setDate(dueDate.getDate() + 10);
+
      console.log("Due date :", dueDate);
 
      if (loanDetails.fundsLocation.toString() === "1") {
@@ -347,6 +403,23 @@ const LoanDetails = () => {
      }
      if (loanDetails.fundsLocation.toString() === "3") {
         setNeedsBorrowerHash(true);
+     }
+     if (loanDetails.fundsLocation.toString() === "4") {
+
+        try {
+           // find loan payoff amount for display
+
+           const paymentDemand = await loanContract.getPaymentDemand(loanId,loanDetails.locationExpiryDate.toNumber());
+           console.log("Payment demand : "+JSON.stringify(paymentDemand));
+           setLoanPayoff(paymentDemand.toNumber());
+           console.log("Loan payment demand : ", paymentDemand.toNumber());
+           setNeedsBorrowerPayback(true);
+        }
+        catch (err) {
+           console.log("Error : ", JSON.stringify(err));
+           console.log("Error msg : ", err.error.data.message);
+           alert("Error msg : "+err.error.data.message);
+        }
      }
         
      if (loanDetails.tokenID === loans.WBTC_ADDRESS) {
@@ -397,12 +470,20 @@ const LoanDetails = () => {
                            <CTableDataCell>{loanDetails.rate.toString()}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Hashed Secret</CTableHeaderCell>
+                           <CTableDataCell scope="row">{loanDetails.borrowerHashedSecret.slice(2, loanDetails.borrowerHashedSecret.length)}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
                            <CTableHeaderCell scope="row">Borrower Secret</CTableHeaderCell>
-                           <CTableDataCell scope="row">{loanDetails.borrowerHashedSecret}</CTableDataCell>
+                           <CTableDataCell scope="row">{loanDetails.borrowerSecret.slice(2, loanDetails.borrowerSecret.length)}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Lender Hashed Secret</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.lenderHashedSecret.slice(2, loanDetails.lenderHashedSecret.length)}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Lender Secret</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.lenderHashedSecret}</CTableDataCell>
+                           <CTableDataCell scope="row">{loanDetails.lenderSecret.slice(2, loanDetails.lenderSecret.length)}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Lender Funding Pub Key</CTableHeaderCell>
@@ -451,6 +532,26 @@ const LoanDetails = () => {
                 </div>
                 <CButton type="submit" color="success" variant="outline" onClick={() => handleAddBorrowerSig()}>
                   Add Borrower Funding Signature 
+                </CButton>
+              </CForm>
+              <br />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+      }
+      {isMetamaskConnected && needsBorrowerPayback &&
+      <CRow>
+        <CCol xs>
+          <CCard className="mb-4">
+            <CCardBody>
+              <CForm>
+                <div className="mb-3">
+                  <CFormLabel>Borrower Loan Payback</CFormLabel>
+                  <CFormText id="borrowerLoanPaybackHelp">Payoff the current loan balance : {loanPayoff}</CFormText>
+                </div>
+                <CButton type="submit" color="success" variant="outline" onClick={() => handleBorrowerPayback()}>
+                  Payback loan as borrower 
                 </CButton>
               </CForm>
               <br />
