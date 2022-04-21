@@ -112,9 +112,12 @@ const RequestLoan = () => {
       const loanApplicationFee = await loanContract.loanApplicationFee(loanamt.value); //in satoshi
       console.log("Loan application fee : ", loanApplicationFee)
 
+      // loanterm is captured in days, but we need to convert to seconds ...
+      let loanTermSeconds = loanterm.value * 86400;
+
       const tx = await loanContract.requestLoan(assetType.value, 
                                                 loanamt.value, 
-                                                loanterm.value, 
+                                                loanTermSeconds, 
                                                 hashsecrethex,
                                                 pubkey1.value,
                                                 pubkey2.value,
