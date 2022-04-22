@@ -446,10 +446,16 @@ const LoanDetails = () => {
      console.log("status : ", statusMap[loanDetails.fundsLocation.toString()], " ", loanDetails.fundsLocation.toString());
      console.log("loan status expiry date : ", loanDetails.locationExpiryDate.toString());
 
-     var dueDate = new Date();
-     dueDate.setDate(dueDate.getDate() + 10);
+     let expiryDateInMillis = loanDetails.locationExpiryDate.mul(1000);
+     let dueDate = new Date(expiryDateInMillis.toNumber());
+     let dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+     let formattedDueDate = dueDate.toLocaleDateString("en-US", dateOptions);
+     console.log("Due date :", formattedDueDate);
 
-     console.log("Due date :", dueDate);
+     // convert loan term to days (stored in seconds) for display to the user
+     let termOfLoan = loanDetails.loanTerm.div(86400);
+     console.log("Term of loan in days : ", termOfLoan.toString());
+    
 
      if (loanDetails.fundsLocation.toString() === "1") {
         setNeedsBorrowerSignature(true);
@@ -518,11 +524,11 @@ const LoanDetails = () => {
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Term</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.loanTerm.toString()}</CTableDataCell>
+                           <CTableDataCell>{termOfLoan.toString()} days</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Due Date</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.locationExpiryDate.toString()}</CTableDataCell>
+                           <CTableDataCell>{formattedDueDate}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
                            <CTableHeaderCell scope="row">Interest Rate</CTableHeaderCell>
