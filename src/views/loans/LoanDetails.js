@@ -543,6 +543,18 @@ const LoanDetails = () => {
                            <CTableDataCell scope="row">{loanDetails.borrowerSecret.slice(2, loanDetails.borrowerSecret.length)}</CTableDataCell>
                          </CTableRow>
                          <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Funding Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[0]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Vault Pub Key</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[1]}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
+                           <CTableHeaderCell scope="row">Borrower Signature</CTableHeaderCell>
+                           <CTableDataCell>{loanDetails.borrowerSignature}</CTableDataCell>
+                         </CTableRow>
+                         <CTableRow>
                            <CTableHeaderCell scope="row">Lender Hashed Secret</CTableHeaderCell>
                            <CTableDataCell>{loanDetails.lenderHashedSecret.slice(2, loanDetails.lenderHashedSecret.length)}</CTableDataCell>
                          </CTableRow>
@@ -557,14 +569,6 @@ const LoanDetails = () => {
                          <CTableRow>
                            <CTableHeaderCell scope="row">Lender Vault Pub Key</CTableHeaderCell>
                            <CTableDataCell>{loanDetails.lenderBtcPubKeys[1]}</CTableDataCell>
-                         </CTableRow>
-                         <CTableRow>
-                           <CTableHeaderCell scope="row">Borrower Funding Pub Key</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[0]}</CTableDataCell>
-                         </CTableRow>
-                         <CTableRow>
-                           <CTableHeaderCell scope="row">Borrower Vault Pub Key</CTableHeaderCell>
-                           <CTableDataCell>{loanDetails.borrowerBtcPubKeys[1]}</CTableDataCell>
                          </CTableRow>
                        </CTableBody>
                      </CTable>
