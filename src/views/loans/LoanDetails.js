@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate, useLocation } from "react-router-dom";
 
 import {
+  CAlert,
   CImage,
   CButton,
   CFormSelect,
@@ -100,6 +101,10 @@ const LoanDetails = () => {
 
   const [loanTile, setLoanTile ] = useState();
 
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertMsg, setAlertMsg] = useState('')
+  const [alertColor, setAlertColor] = useState('')
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -147,11 +152,19 @@ const LoanDetails = () => {
          const receipt = await tx.wait();
          console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
          console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+         setAlertMsg("Borrower loan repayment was successful");
+         setAlertColor("success");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'}); 
       }
       catch (err) {
          console.log("Error : ", err);
          console.log("Error msg : ", err.data.message);
-         alert("Error msg : "+err.data.message);
+         setAlertMsg("Unable to process loan repayment - reason : "+err.data.message);
+         setAlertColor("danger");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
   }
 
@@ -202,11 +215,19 @@ const LoanDetails = () => {
          const receipt = await tx.wait();
          console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
          console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+         setAlertMsg("Loan escrow funds were released to the borrower");
+         setAlertColor("success");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
       catch (err) {
          console.log("Error : ", err);
          console.log("Error msg : ", err.data.message);
-         alert("Error msg : "+err.data.message);
+         setAlertMsg("Unable to release funds to borrower - reason : "+err.data.message);
+         setAlertColor("danger");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
   }
 
@@ -257,11 +278,19 @@ const LoanDetails = () => {
          const receipt = await tx.wait();
          console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
          console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+         setAlertMsg("Loan escrow funds were released to the lender");
+         setAlertColor("success");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
       catch (err) {
          console.log("Error : ", err);
          console.log("Error msg : ", err.data.message);
-         alert("Error msg : "+err.data.message);
+         setAlertMsg("Unable to release funds to lender - reason : "+err.data.message);
+         setAlertColor("danger");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
   }
 
@@ -308,11 +337,19 @@ const LoanDetails = () => {
          const receipt = await tx.wait();
          console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
          console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+         setAlertMsg("Loan has been funded by the lender and awaiting claim from the borrower");
+         setAlertColor("success");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
       catch (err) {
          console.log("Error : ", err);
          console.log("Error msg : ", err.data.message);
-         alert("Error msg : "+err.data.message);
+         setAlertMsg("Unable to approve funds release to borrower - reason : "+err.data.message);
+         setAlertColor("danger");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
   }
 
@@ -361,11 +398,19 @@ const LoanDetails = () => {
          const receipt = await tx.wait();
          console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
          console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+
+         setAlertMsg("Borrower signature was successfully added!");
+         setAlertColor("success");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'}); 
       }
       catch (err) {
          console.log("Error : ", err);
          console.log("Error msg : ", err.data.message);
-         alert("Error msg : "+err.data.message);
+         setAlertMsg("Unable to add borrower signature - reason : "+err.data.message);
+         setAlertColor("danger");
+         setAlertVisible(true);
+         window.scrollTo({top: 0, behavior: 'smooth'});
       }
 
 
@@ -584,6 +629,11 @@ const LoanDetails = () => {
   }, [])
   return (
     <>
+      <CRow>
+        <div className="mb-3">
+          <CAlert color={alertColor} dismissible visible={alertVisible} onClose={() => setAlertVisible(false)}>{alertMsg}</CAlert>
+        </div>
+      </CRow>
       <CRow>
       {loanTile}
       </CRow>

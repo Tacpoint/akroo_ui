@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 
 import {
+  CAlert,
   CImage,
   CButton,
   CFormSelect,
@@ -77,6 +78,9 @@ const AddPubKeys = () => {
   const [wbtcTokenAddress, setWbtcTokenAddress] = useState()
   const [rbtcTokenAddress, setRbtcTokenAddress] = useState()
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertMsg, setAlertMsg] = useState('')
+  const [alertColor, setAlertColor] = useState('')
 
   const navigate = useNavigate();
 
@@ -116,11 +120,18 @@ const AddPubKeys = () => {
       const receipt = await tx.wait();
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
+      setAlertMsg("Public keys and hash were successfully added!");
+      setAlertColor("success");
+      setAlertVisible(true);
+      window.scrollTo({top: 0, behavior: 'smooth'});
 
     }
     catch (err) {
       console.log(JSON.stringify(err))
-      alert(JSON.stringify(err))
+      setAlertMsg("Unable to add public keys and hash - reason : "+err);
+      setAlertColor("danger");
+      setAlertVisible(true);
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
   }
@@ -170,19 +181,22 @@ const AddPubKeys = () => {
             <CCardBody>
               <CForm>
                 <div className="mb-3">
-                  <CFormLabel>Lender public key #1</CFormLabel>
+                   <CAlert color={alertColor} dismissible visible={alertVisible} onClose={() => setAlertVisible(false)}>{alertMsg}</CAlert>
+                </div>
+                <div className="mb-3">
+                  <CFormLabel>Lender Funding public key</CFormLabel>
                   <CFormInput type="text" id="pubkey1" aria-describedby="pubkey1help" />
                   <CFormText id="pubkey1help">This pub key is used for the Bitcoin funding address</CFormText>
                 </div>
                 <div className="mb-3">
-                  <CFormLabel>Lender public key #2</CFormLabel>
+                  <CFormLabel>Lender Vault public key</CFormLabel>
                   <CFormInput type="text" id="pubkey2" aria-describedby="pubkey2help" />
                   <CFormText id="pubkey2help">This pub key is used for the Bitcoin vault address</CFormText>
                 </div>
                 <div className="mb-3">
-                  <CFormLabel>Lender hashed secret</CFormLabel>
+                  <CFormLabel>Lender Vault hashed secret</CFormLabel>
                   <CFormInput type="text" id="hashsecret" aria-describedby="hashSecretHelp" />
-                  <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The lender reveals the actual secret once the borrower repays the loan allowing the lender to regain possession of tokens that were borrowed</CFormText>
+                  <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The lender reveals the actual secret once the borrower repays the loan allowing the lender to take possesion of the loan payment and the borrower to spend from the Bitcoin Vault transaction</CFormText>
                 </div>
                 <CButton type="submit" color="success" variant="outline" onClick={() => handleAddPubKeysRequest()}>
                   Submit

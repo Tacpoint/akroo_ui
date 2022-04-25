@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 
 import {
+  CAlert,
   CImage,
   CButton,
   CFormSelect,
@@ -78,6 +79,10 @@ const RequestLoan = () => {
   const [rbtcTokenAddress, setRbtcTokenAddress] = useState()
   const [isMetamaskConnected, setIsMetamaskConnected] = useState(false)
 
+  const [alertVisible, setAlertVisible] = useState(false)
+  const [alertMsg, setAlertMsg] = useState('')
+  const [alertColor, setAlertColor] = useState('')
+
   const navigate = useNavigate();
 
   const handleLoanRequest = async () => {
@@ -129,32 +134,17 @@ const RequestLoan = () => {
       console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
       console.log(`Gas used: ${receipt.gasUsed.toString()}`);
 
-
-      /*
-      let bn = ethers.BigNumber.from(depositAmt.value)
-      const tx = await loanContract.deposit(loans.WBTC_ADDRESS, bn, {from:userAddress})
-
-
-      console.log(`Transaction hash: ${tx.hash}`);
-      const receipt = await tx.wait();
-      console.log(`Transaction confirmed in block ${receipt.blockNumber}`);
-      console.log(`Gas used: ${receipt.gasUsed.toString()}`);
-
-
-      const userWbtcVaultFunds = await loanContract.UserTotalVaultFunds(userAddress, loans.WBTC_ADDRESS)
-      setWbtcOnDeposit(userWbtcVaultFunds.toString())
-
-      const wbtcContract = new ethers.Contract(loans.WBTC_ADDRESS, wbtc.abi, signer)
-      const wbtcAuthAmt = await wbtcContract.allowance(userAddress, loans.LOAN_ADDRESS)
-      const wbtcBalance = await wbtcContract.balanceOf(userAddress)
-      setWbtcBalance(wbtcBalance.toString())
-      setWbtcAuthorized(wbtcAuthAmt.toString())
-      */
-
+      setAlertMsg("Loan application was successfully processed");
+      setAlertColor("success");
+      setAlertVisible(true);
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
     catch (err) {
       console.log(JSON.stringify(err))
-      alert(JSON.stringify(err))
+      setAlertMsg("Unable process loan application - reason : "+err);
+      setAlertColor("danger");
+      setAlertVisible(true);
+      window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
   }
@@ -204,6 +194,9 @@ const RequestLoan = () => {
             <CCardBody>
               <CForm>
                 <div className="mb-3">
+                  <CAlert color={alertColor} dismissible visible={alertVisible} onClose={() => setAlertVisible(false)}>{alertMsg}</CAlert>
+                </div>
+                <div className="mb-3">
                   <CFormSelect aria-label="Default select example" id="assettype">
                     <option>Choose an asset to borrow</option>
                     <option value={rbtcTokenAddress}>renBTC</option>
@@ -211,17 +204,17 @@ const RequestLoan = () => {
                   </CFormSelect>
                 </div>
                 <div className="mb-3">
-                  <CFormLabel>Borrower public key #1</CFormLabel>
+                  <CFormLabel>Borrower Funding public key</CFormLabel>
                   <CFormInput type="text" id="pubkey1" aria-describedby="pubkey1help" />
-                  <CFormText id="pubkey1help">This pub key is used for the Bitcoin funding address</CFormText>
+                  <CFormText id="pubkey1help">This pub key is used for the Bitcoin funding transaction</CFormText>
                 </div>
                 <div className="mb-3">
-                  <CFormLabel>Borrower public key #2</CFormLabel>
+                  <CFormLabel>Borrower Vault public key</CFormLabel>
                   <CFormInput type="text" id="pubkey2" aria-describedby="pubkey2help" />
-                  <CFormText id="pubkey2help">This pub key is used for the Bitcoin vault address</CFormText>
+                  <CFormText id="pubkey2help">This pub key is used for the Bitcoin vault transaction</CFormText>
                 </div>
                 <div className="mb-3">
-                  <CFormLabel>Borrower hashed secret</CFormLabel>
+                  <CFormLabel>Borrower Funding hashed secret</CFormLabel>
                   <CFormInput type="text" id="hashsecret" aria-describedby="hashSecretHelp" />
                   <CFormText id="hashSecretHelp">The sha256 hash of the &quot;secret&quot;.  The borrower reveals the actual secret in order to take control of the funds being borrowed</CFormText>
                 </div>
