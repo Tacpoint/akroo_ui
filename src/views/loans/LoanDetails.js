@@ -223,8 +223,8 @@ const LoanDetails = () => {
       }
       catch (err) {
          console.log("Error : ", err);
-         console.log("Error msg : ", err.data.message);
-         setAlertMsg("Unable to release funds to borrower - reason : "+err.data.message);
+         console.log("Error msg : ", err);
+         setAlertMsg("Unable to release funds to borrower - reason : "+err);
          setAlertColor("danger");
          setAlertVisible(true);
          window.scrollTo({top: 0, behavior: 'smooth'});
