@@ -49,8 +49,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Pub Keys / Secrets',
-        to: '/pubkeys',
+        name: 'Add pub Keys / Secrets',
+        to: '/addpubkeys',
       },
     ],
   },

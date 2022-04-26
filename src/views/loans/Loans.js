@@ -200,8 +200,13 @@ const Loans = () => {
          console.log("status : ", statusMap[loanDetails.fundsLocation.toString()]);
          console.log("loan status expiry date : ", loanDetails.locationExpiryDate.toString());
 
-         var dueDate = new Date(loanDetails.locationExpiryDate.toNumber());
-         console.log("Due date :", dueDate);
+         let termOfLoan = loanDetails.loanTerm.div(86400);
+
+         let expiryDateInMillis = loanDetails.locationExpiryDate.mul(1000);
+         let dueDate = new Date(expiryDateInMillis.toNumber());
+         let dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+         let formattedDueDate = dueDate.toLocaleDateString("en-US", dateOptions);
+         console.log("Due date :", formattedDueDate);
 
          // want to create a new row for every 3 records ...
 
@@ -254,11 +259,11 @@ const Loans = () => {
                        </div>
                        <div className="keyvaluewrapper">
                            <div className="itemkey">Term:</div>
-                           <div className="itemvalue">{loanDetails.loanTerm.toString()}</div>
+                           <div className="itemvalue">{termOfLoan.toString()} days</div>
                        </div>   
                        <div className="keyvaluewrapper">
                            <div className="itemkey">Due Date:</div>
-                           <div className="itemvalue">{loanDetails.locationExpiryDate.toString()}</div>
+                           <div className="itemvalue">{formattedDueDate.toString()}</div>
                        </div>      
                        <div className="keyvaluewrapper">
                            <div className="itemkey">Interest Rate:</div>
